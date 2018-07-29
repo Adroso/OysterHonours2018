@@ -11,5 +11,9 @@ from matplotlib import pyplot as plt
 image = cv2.imread('OysterImages/1 (21).JPG')
 image = image[1:1000, 850:1700]
 
-edges = cv2.Canny(image, 50, 50)
+gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+clahe = cv2.createCLAHE(clipLimit=0.5, tileGridSize=(1,1))
+gray = clahe.apply(gray)
+
+edges = cv2.SURF
 cv2.imshow('canny', edges)
