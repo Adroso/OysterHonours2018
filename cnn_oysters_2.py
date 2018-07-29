@@ -7,9 +7,9 @@ import matplotlib.pyplot as plt
 import math
 
 image = ski.imread('OysterImages/1 (20).JPG', as_grey=True)
+image = image[1:1000, 850:1700] #crop
 
 #pre processing of image
-image = exposure.adjust_gamma(image,0.2)
 plt.imshow(image)
 plt.show()
 tf.reset_default_graph()
@@ -51,7 +51,7 @@ result_angle_norm = result_angle[0,:,:,0]
 result_red = np.absolute(result_lenght_norm * np.cos(result_angle_norm+4.2))
 result_green = np.absolute(result_lenght_norm * np.cos(result_angle_norm+2.1))
 result_blue = np.absolute(result_lenght_norm * np.cos(result_angle_norm))
-result_rgb = np.zeros((3000,2250,3))
+result_rgb = np.zeros((999,850,3))
 result_rgb[...,0] = (result_red + (np.min(result_red)*-1) ) / (np.min(result_red)*-1 + np.max(result_red))
 result_rgb[...,1] = (result_green + (np.min(result_green)*-1) ) / (np.min(result_green)*-1 + np.max(result_green))
 result_rgb[...,2] = (result_blue + (np.min(result_blue)*-1) ) / (np.min(result_blue)*-1 + np.max(result_blue))
