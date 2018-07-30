@@ -12,9 +12,9 @@ def midpoint(ptA, ptB):
 
 
 #load image and specify width of the left most object
-image = cv2.imread('OysterImages/1 (21).JPG')
-image = image[1:1000, 850:1700]
-width = 19.75 #milimeters
+image = cv2.imread('OysterImages/O4.JPG')
+#image = image[1:1000, 850:1700]
+width = 95 #milimeters
 
 height, width = image.shape[:2]
 #pre-processing
@@ -52,7 +52,7 @@ pixelsPerMetric = None
 for c in cnts:
 	print(cv2.contourArea(c))
 	# if the contour is not sufficiently large, ignore it
-	if cv2.contourArea(c) < 15:
+	if cv2.contourArea(c) < 100:
 		print(cv2.contourArea(c))
 		continue
 

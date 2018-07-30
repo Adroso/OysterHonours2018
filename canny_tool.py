@@ -6,9 +6,10 @@ def nothing(x):
     pass
 
 # read the experimental image
-img = cv2.imread('OysterImages/1 (20).JPG', 0)
-img = img[1:1000, 850:1700]
+img = cv2.imread('OysterImages/O4.jpg', 0)
+#img = img[0:2000, 500:3000]
 
+img = cv2.GaussianBlur(img,(5,5),0)
 # create trackbar for canny edge detection threshold changes
 cv2.namedWindow('canny')
 

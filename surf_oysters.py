@@ -11,9 +11,11 @@ from matplotlib import pyplot as plt
 image = cv2.imread('OysterImages/1 (21).JPG')
 image = image[1:1000, 850:1700]
 
-gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-clahe = cv2.createCLAHE(clipLimit=0.5, tileGridSize=(1,1))
-gray = clahe.apply(gray)
+edged = cv2.Canny(image, 250, 250)
+test = cv2.Sobel(image, cv2.CV_64F, 1, 0, ksize=5)
 
-edges = cv2.SURF
-cv2.imshow('canny', edges)
+cv2.imshow('edges', test)
+cv2.waitKey(0)
+
+cv2.imshow("thing", image)
+cv2.waitKey(0)
