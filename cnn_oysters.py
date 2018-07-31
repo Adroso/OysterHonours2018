@@ -32,6 +32,7 @@ if len(kernel_h) == 0 or len(kernel_v) == 0:
 
 input_placeholder = tf.placeholder(
     dtype=tf.float32, shape=(1, image.shape[0], image.shape[1], 1))
+
 with tf.name_scope('convolution'):
     conv_w_h = tf.constant(kernel_h, dtype=tf.float32, shape=(5, 5, 1, 1))
     conv_w_v = tf.constant(kernel_v, dtype=tf.float32, shape=(5, 5, 1, 1))

@@ -5,6 +5,8 @@ import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
 import math
+import cv2
+import pandas
 
 image = ski.imread('OysterImages/1 (20).JPG', as_grey=True)
 image = image[1:1000, 850:1700] #crop
@@ -54,12 +56,19 @@ result_angle_norm = result_angle[0,:,:,0]
 result_red = np.absolute(result_lenght_norm * np.cos(result_angle_norm+4.2))
 result_green = np.absolute(result_lenght_norm * np.cos(result_angle_norm+2.1))
 result_blue = np.absolute(result_lenght_norm * np.cos(result_angle_norm))
-result_rgb = np.zeros((499,425,3))
+result_rgb = np.zeros((499,425, 3))
 result_rgb[...,0] = (result_red + (np.min(result_red)*-1) ) / (np.min(result_red)*-1 + np.max(result_red))
 result_rgb[...,1] = (result_green + (np.min(result_green)*-1) ) / (np.min(result_green)*-1 + np.max(result_green))
 result_rgb[...,2] = (result_blue + (np.min(result_blue)*-1) ) / (np.min(result_blue)*-1 + np.max(result_blue))
 #result_rgb
 
-plt.imshow(result_rgb)
+i = 1
+for vertical_pixel_array in result_rgb: #note the array has 3 wide values, rgb channels. these will need to be averaged then used
+    d = pandas.DataFrame(vertical_pixel_array)
+    d.to_csv("F:\\Honours Image Library\\CSVs\\new{}.csv".format(i))
+    i+= 1
+
+
+#plt.imshow(result_rgb)
 
 plt.show()
