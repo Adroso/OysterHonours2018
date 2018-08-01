@@ -62,13 +62,28 @@ result_rgb[...,1] = (result_green + (np.min(result_green)*-1) ) / (np.min(result
 result_rgb[...,2] = (result_blue + (np.min(result_blue)*-1) ) / (np.min(result_blue)*-1 + np.max(result_blue))
 #result_rgb
 
-i = 1
+horizontal_pixel_id = 0
+vertical_pixel_id = 0
+max_loop = 0 #425 as above
+filtered_result = []
 for vertical_pixel_array in result_rgb: #note the array has 3 wide values, rgb channels. these will need to be averaged then used
-    d = pandas.DataFrame(vertical_pixel_array)
-    d.to_csv("F:\\Honours Image Library\\CSVs\\new{}.csv".format(i))
-    i+= 1
+    #print("Current Horizontal Pixel: ", horizontal_pixel_id)
+    #print(vertical_pixel_array)
+    inner_list = []
+    for vertical_pixel in vertical_pixel_array:
+        #print(vertical_pixel)
+        new_pixel_value = np.mean(vertical_pixel)
+        if new_pixel_value < 0.19:
+            new_pixel_value = 0
+        inner_list.append(new_pixel_value)
 
+    filtered_result.append(inner_list)
+    horizontal_pixel_id +=1
 
-#plt.imshow(result_rgb)
+print(filtered_result)
+
+print(horizontal_pixel_id)
+
+plt.imshow(filtered_result)
 
 plt.show()
