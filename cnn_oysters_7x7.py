@@ -14,22 +14,16 @@ plt.imshow(image)
 plt.show()
 tf.reset_default_graph()
 
-# Write the kernel weights as a 2D array.
-#kernel_h = np.array([3, 3])
-#kernel_h = [ [-1,-2,-1], [0,0,0], [1,2,1] ]
-#kernel_v = np.array([3, 3])
-#kernel_v = [ [-1,0,-1], [-2,0,-2], [-1,0,-1] ]
-
-# 5x5 Kernals
-kernel_h = np.array([5, 5])
+# Kernals
+kernel_h = np.array([7, 7])
 #kernel_h = [[-4,-4,-4,-4,-4],[-3,-3,-3,-3,-3],[-2,-2,-2,-2,-2],[-1,-1,-1,-1,-1],[0,0,0,0,0]]
-kernel_v = np.array([5, 5])
+kernel_v = np.array([7, 7])
 #kernel_v = [[-4,-3,-2,-1,0],[-4,-3,-2, -1,0],[-4,-3,-2, -1,0],[-4,-3,-2,-1,0],[-4,-3,-2,-1,0]]
 
 
-kernel_h = [[-2,-2,-2,-2,-2],[-1,-1,-1,-1,-1],[0,0,0,0,0],[1,1,1,1,1],[2,2,2,2,2]]
+kernel_h = [[-3,-3,-3,-3,-3],[-2,-2,-2,-2,-2],[-1,-1,-1,-1,-1],[0,0,0,0,0],[1,1,1,1,1],[2,2,2,2,2],[3,3,3,3,3]]
 
-kernel_v = [[-2,-1,0,1,2],[-2,-1,0,1,2],[-2,-1,0,1,2],[-2,-1,0,1,2],[-2,-1,0,1,2]]
+kernel_v = [[-3,-2,-1,0,1,2,3],[-3,-2,-1,0,1,2,3],[-3,-2,-1,0,1,2,3],[-3,-2,-1,0,1,2,3],[-3,-2,-1,0,1,2,3],[-3,-2,-1,0,1,2,3],[-3,-2,-1,0,1,2,3]]
 
 # Kernel weights
 if len(kernel_h) == 0 or len(kernel_v) == 0:
@@ -39,12 +33,12 @@ input_placeholder = tf.placeholder(
     dtype=tf.float32, shape=(1, image.shape[0], image.shape[1], 1))
 
 with tf.name_scope('convolution'):
-    conv_w_h = tf.constant(kernel_h, dtype=tf.float32, shape=(5, 5, 1, 1))
-    conv_w_v = tf.constant(kernel_v, dtype=tf.float32, shape=(5, 5, 1, 1))
+    conv_w_h = tf.constant(kernel_h, dtype=tf.float32, shape=(7, 7, 1, 1))
+    conv_w_v = tf.constant(kernel_v, dtype=tf.float32, shape=(7, 7, 1, 1))
     output_h = tf.nn.conv2d(input=input_placeholder, filter=conv_w_h, strides=[1, 1, 1, 1], padding='SAME')
     output_v = tf.nn.conv2d(input=input_placeholder, filter=conv_w_v, strides=[1, 1, 1, 1], padding='SAME')
-    output_h = tf.layers.max_pooling2d(output_h, 2,2)
-    output_v = tf.layers.max_pooling2d(output_v, 2,2)
+    output_h = tf.layers.max_pooling2d(output_h, 5,5)
+    output_v = tf.layers.max_pooling2d(output_v, 5,5)
 
 
 with tf.Session() as sess:
@@ -52,6 +46,7 @@ with tf.Session() as sess:
             input_placeholder: image[np.newaxis, :, :, np.newaxis]})
     result_v = sess.run(output_v, feed_dict={
             input_placeholder: image[np.newaxis, :, :, np.newaxis]})
+
 
 
 result_lenght = ((result_v**2) + (result_h**2))**0.5
@@ -66,12 +61,10 @@ result_angle_norm = result_angle[0,:,:,0]
 result_red = np.absolute(result_lenght_norm * np.cos(result_angle_norm+4.2))
 result_green = np.absolute(result_lenght_norm * np.cos(result_angle_norm+2.1))
 result_blue = np.absolute(result_lenght_norm * np.cos(result_angle_norm))
-result_rgb = np.zeros((499,425,3))
+result_rgb = np.zeros((199,170,3))
 result_rgb[...,0] = (result_red + (np.min(result_red)*-1) ) / (np.min(result_red)*-1 + np.max(result_red))
 result_rgb[...,1] = (result_green + (np.min(result_green)*-1) ) / (np.min(result_green)*-1 + np.max(result_green))
 result_rgb[...,2] = (result_blue + (np.min(result_blue)*-1) ) / (np.min(result_blue)*-1 + np.max(result_blue))
-#result_rgb
 
 plt.imshow(result_rgb)
-
 plt.show()

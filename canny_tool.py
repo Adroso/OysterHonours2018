@@ -6,7 +6,7 @@ def nothing(x):
     pass
 
 # read the experimental image
-img = cv2.imread('OysterImages/O4.jpg', 0)
+img = cv2.imread('OysterImages/Custom/g1_croped_lensecorrected.jpg', 0)
 #img = img[0:2000, 500:3000]
 
 img = cv2.GaussianBlur(img,(5,5),0)
