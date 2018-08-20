@@ -34,3 +34,25 @@ for position, value in enumerate(list): #assuming pixel 1 will never have an edg
                 pixel_value = 1
 
             starting_edge = None
+
+
+#copied 20/8
+if pixel_value == 0:
+    # starting_edge = position
+    pixel_value = 1
+
+    if vp[position - 1] > 0:
+        starting_edge = position
+        pixel_value = 0
+
+    elif position + 1 < len(vp) and vp[position + 1] > 0:
+        ending_edge = position
+        pixel_distance = ending_edge - starting_edge
+        if pixel_distance > 0:
+            print(pixel_distance)
+            major_distance_count += 1
+            # pixel_value = 1
+        else:
+            minor_distance_count += 1
+            # pixel_value = 1
+        starting_edge = None

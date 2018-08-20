@@ -8,10 +8,10 @@ import math
 import cv2
 import pandas
 
-image = ski.imread('OysterImages/Custom/g1_croped_lensecorrected.jpg', as_grey=True)
+image = ski.imread('OysterImages/devided/1.jpg', as_grey=True)
 #image = image[1:3000, 850:1700] #crop
 
-image = cv2.GaussianBlur(image,(5,5), 0)
+#image = cv2.GaussianBlur(image,(5,5), 0)
 #pre processing of image
 plt.imshow(image)
 plt.show()
@@ -57,7 +57,7 @@ result_angle_norm = result_angle[0,:,:,0]
 result_red = np.absolute(result_lenght_norm * np.cos(result_angle_norm+4.2))
 result_green = np.absolute(result_lenght_norm * np.cos(result_angle_norm+2.1))
 result_blue = np.absolute(result_lenght_norm * np.cos(result_angle_norm))
-result_rgb = np.zeros((456,716, 3))
+result_rgb = np.zeros((187,208, 3))
 result_rgb[...,0] = (result_red + (np.min(result_red)*-1) ) / (np.min(result_red)*-1 + np.max(result_red))
 result_rgb[...,1] = (result_green + (np.min(result_green)*-1) ) / (np.min(result_green)*-1 + np.max(result_green))
 result_rgb[...,2] = (result_blue + (np.min(result_blue)*-1) ) / (np.min(result_blue)*-1 + np.max(result_blue))
@@ -74,8 +74,10 @@ for vertical_pixel_array in result_rgb: #note the array has 3 wide values, rgb c
     for vertical_pixel in vertical_pixel_array:
         #print(vertical_pixel)
         new_pixel_value = np.mean(vertical_pixel)
-        if new_pixel_value < 0.08:
+        if new_pixel_value < 0.09:
             new_pixel_value = 0
+        else:
+            new_pixel_value =1
         inner_list.append(new_pixel_value)
 
     filtered_result.append(inner_list)
@@ -86,32 +88,22 @@ minor_distance_count = 0
 
 oysters = []
 for vp in filtered_result:
-    pass_id = 0
-    current_distance = 0
-    starting_edge = None
+    starting_edge = -1
+    ending_edge = -1
 
     inner_oyster = []
-    for position, pixel_value in enumerate(vp):
+    for position, pixel_value in enumerate(vp[:-1]):
+        if pixel_value == 1 and vp[position+1] == 0 and starting_edge == -1:
+            starting_edge = position
 
-        if pixel_value == 0:
-            #starting_edge = position
-            pixel_value = 1
+        elif pixel_value == 1 and vp[position-1] == 0 and starting_edge > 0:
+            ending_edge = position
 
-            if vp[position-1] > 0:
-                starting_edge = position
-                pixel_value = 0
-
-            elif position+1 < len(vp) and vp[position+1] > 0:
-                ending_edge = position
-                pixel_distance = ending_edge - starting_edge
-                if pixel_distance > 0:
-                    print(pixel_distance)
-                    major_distance_count += 1
-                    #pixel_value = 1
-                else:
-                    minor_distance_count += 1
-                    #pixel_value = 1
-                starting_edge = None
+            distance = ending_edge - starting_edge
+            if distance > 1:
+                major_distance_count +=1
+            else:
+                minor_distance_count +=1
 
         inner_oyster.append(pixel_value)
     oysters.append(inner_oyster)
