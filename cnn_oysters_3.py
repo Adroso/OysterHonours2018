@@ -74,7 +74,7 @@ for vertical_pixel_array in result_rgb: #note the array has 3 wide values, rgb c
     for vertical_pixel in vertical_pixel_array:
         #print(vertical_pixel)
         new_pixel_value = np.mean(vertical_pixel)
-        if new_pixel_value < 0.09:
+        if new_pixel_value < 0.1:
             new_pixel_value = 0
         else:
             new_pixel_value =1
@@ -92,18 +92,22 @@ for vp in filtered_result:
     ending_edge = -1
 
     inner_oyster = []
+    gg = 0
     for position, pixel_value in enumerate(vp[:-1]):
         if pixel_value == 1 and vp[position+1] == 0 and starting_edge == -1:
             starting_edge = position
-
-        elif pixel_value == 1 and vp[position-1] == 0 and starting_edge > 0:
+        elif pixel_value == 1 and vp[position-1]==0 and starting_edge != -1:
             ending_edge = position
-
             distance = ending_edge - starting_edge
-            if distance > 1:
-                major_distance_count +=1
+            if distance > 40:
+                vp[starting_edge:ending_edge +1] = [1]*((ending_edge+1) - starting_edge)
             else:
-                minor_distance_count +=1
+                vp[starting_edge:ending_edge + 1] = [0] * ((ending_edge + 1) - starting_edge)
+
+            starting_edge = -1
+            ending_edge = -1
+        else:
+            vp[position] = 0
 
         inner_oyster.append(pixel_value)
     oysters.append(inner_oyster)
@@ -113,7 +117,7 @@ for vp in filtered_result:
 print("majors: ", major_distance_count)
 print("minors: ", minor_distance_count)
 
-plt.imshow(oysters)
-#plt.imshow(filtered_result)
+#plt.imshow(oysters)
+plt.imshow(filtered_result)
 
 plt.show()
