@@ -8,7 +8,7 @@ import math
 import cv2
 import pandas
 
-image = ski.imread('OysterImages/Custom/g1_croped_lensecorrected.jpg', as_grey=True)
+image = ski.imread('OysterImages/devided/1.jpg', as_grey=True)
 #image = image[1:3000, 850:1700] #crop
 
 #image = cv2.GaussianBlur(image,(5,5), 0)
@@ -57,12 +57,13 @@ result_angle_norm = result_angle[0,:,:,0]
 result_red = np.absolute(result_lenght_norm * np.cos(result_angle_norm+4.2))
 result_green = np.absolute(result_lenght_norm * np.cos(result_angle_norm+2.1))
 result_blue = np.absolute(result_lenght_norm * np.cos(result_angle_norm))
-result_rgb = np.zeros((456,716, 3))
+result_rgb = np.zeros((187,208, 3))
 result_rgb[...,0] = (result_red + (np.min(result_red)*-1) ) / (np.min(result_red)*-1 + np.max(result_red))
 result_rgb[...,1] = (result_green + (np.min(result_green)*-1) ) / (np.min(result_green)*-1 + np.max(result_green))
 result_rgb[...,2] = (result_blue + (np.min(result_blue)*-1) ) / (np.min(result_blue)*-1 + np.max(result_blue))
 #result_rgb
 
+#filtering the list for stronger values
 horizontal_pixel_id = 0
 vertical_pixel_id = 0
 max_loop = 0 #425 as above
@@ -72,9 +73,8 @@ for vertical_pixel_array in result_rgb: #note the array has 3 wide values, rgb c
     #print(vertical_pixel_array)
     inner_list = []
     for vertical_pixel in vertical_pixel_array:
-        #print(vertical_pixel)
         new_pixel_value = np.mean(vertical_pixel)
-        if new_pixel_value < 0.1:
+        if new_pixel_value < 0.12:
             new_pixel_value = 0
         else:
             new_pixel_value =1
@@ -88,8 +88,8 @@ filtered_results_2 = np.array(filtered_result).transpose().tolist()
 major_distance_count = 0
 minor_distance_count = 0
 
-# oysters = []
-# horizontal distances
+
+# coutning horizontal distances
 for hp in filtered_result:
     starting_edge = -1
     ending_edge = -1
@@ -114,9 +114,7 @@ for hp in filtered_result:
         else:
             hp[position] = 0
 
-    #     inner_oyster.append(pixel_value)
-    # oysters.append(inner_oyster)
-
+#counting vertical distances
 for vp in filtered_results_2:
     starting_edge = -1
     ending_edge = -1
@@ -144,7 +142,17 @@ for vp in filtered_results_2:
 print("majors: ", major_distance_count)
 print("minors: ", minor_distance_count)
 
-filteres_2_transposed = np.array(filtered_results_2).transpose().tolist()
+filteres_2_transposed = np.array(filtered_results_2).transpose().tolist() #untransposing to make it look good again.
+
+for position_main, pixel_main in enumerate(filtered_result):
+    for position_idv_pix, pixel_idv_pix in enumerate(pixel_main):
+        if pixel_idv_pix == 0:
+            if filteres_2_transposed[position_main][position_idv_pix] == 1:
+                pixel_main[position_idv_pix] = 1
+
+
+
+# printing out results
 #plt.imshow(oysters)
 #plt.imshow(filtered_results_2)
 #plt.imshow(filteres_2_transposed)
