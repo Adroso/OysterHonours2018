@@ -11,7 +11,7 @@ import pandas
 PIXEL_TO_LOOK = 1
 INVERSE_PIXEL_TO_LOOK = 0
 
-image = ski.imread('OysterImages/Custom/g1_croped_lensecorrected.jpg', as_grey=True)
+image = ski.imread('OysterImages/CustomFinal/1A_cropped.jpg', as_grey=True)
 #image = image[1:3000, 850:1700] #crop
 #TODO Split image
 
@@ -61,7 +61,7 @@ result_angle_norm = result_angle[0,:,:,0]
 result_red = np.absolute(result_lenght_norm * np.cos(result_angle_norm+4.2))
 result_green = np.absolute(result_lenght_norm * np.cos(result_angle_norm+2.1))
 result_blue = np.absolute(result_lenght_norm * np.cos(result_angle_norm))
-result_rgb = np.zeros((456,716, 3))
+result_rgb = np.zeros((150,156, 3))
 result_rgb[...,0] = (result_red + (np.min(result_red)*-1) ) / (np.min(result_red)*-1 + np.max(result_red))
 result_rgb[...,1] = (result_green + (np.min(result_green)*-1) ) / (np.min(result_green)*-1 + np.max(result_green))
 result_rgb[...,2] = (result_blue + (np.min(result_blue)*-1) ) / (np.min(result_blue)*-1 + np.max(result_blue))
@@ -102,17 +102,17 @@ for hp in filtered_result:
     inner_oyster = []
     gg = 0
     for position, pixel_value in enumerate(hp[:-1]):
-        if pixel_value == 1 and hp[position + 1] == 0 and starting_edge == -1:
+        if pixel_value == PIXEL_TO_LOOK and hp[position + 1] == INVERSE_PIXEL_TO_LOOK and starting_edge == -1:
             starting_edge = position
-        elif pixel_value == 1 and hp[position - 1]== 0 and starting_edge != -1:
+        elif pixel_value == PIXEL_TO_LOOK and hp[position - 1]== INVERSE_PIXEL_TO_LOOK and starting_edge != -1:
             ending_edge = position
             distance = ending_edge - starting_edge
             if distance > 40:
-                #hp[starting_edge:ending_edge + 1] = [1] * ((ending_edge + 1) - starting_edge)
+                hp[starting_edge:ending_edge + 1] = [1] * ((ending_edge + 1) - starting_edge)
                 major_distance_count +=1
                 if distance > hp_max[0]:
                     hp_max[0] = distance
-                    #hp[starting_edge:ending_edge + 1] = [0.5] * ((ending_edge + 1) - starting_edge)
+                    hp[starting_edge:ending_edge + 1] = [0.5] * ((ending_edge + 1) - starting_edge)
                     print("Current Max Distance APM: ", distance)
 
             else:
@@ -133,9 +133,9 @@ for vp in filtered_results_2:
     inner_oyster = []
     gg = 0
     for position, pixel_value in enumerate(vp[:-1]):
-        if pixel_value == 1 and vp[position + 1] == 0 and starting_edge == -1:
+        if pixel_value == PIXEL_TO_LOOK and vp[position + 1] == INVERSE_PIXEL_TO_LOOK and starting_edge == -1:
             starting_edge = position
-        elif pixel_value == 1 and vp[position - 1]==0 and starting_edge != -1:
+        elif pixel_value == PIXEL_TO_LOOK and vp[position - 1]==INVERSE_PIXEL_TO_LOOK and starting_edge != -1:
             ending_edge = position
             distance = ending_edge - starting_edge
             if distance > 40:
@@ -144,7 +144,7 @@ for vp in filtered_results_2:
                     vp[starting_edge:ending_edge + 1] = [1] * ((ending_edge + 1) - starting_edge)
                     print("Current Max Distance DVM: ", distance)
                 else:
-                    #vp[starting_edge:ending_edge + 1] = [1] * ((ending_edge + 1) - starting_edge)
+                    vp[starting_edge:ending_edge + 1] = [1] * ((ending_edge + 1) - starting_edge)
                     major_distance_count += 1
             else:
                 vp[starting_edge:ending_edge + 1] = [0] * ((ending_edge + 1) - starting_edge)
