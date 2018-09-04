@@ -8,8 +8,12 @@ import math
 import cv2
 import pandas
 
-image = ski.imread('OysterImages/devided/1.jpg', as_grey=True)
+PIXEL_TO_LOOK = 1
+INVERSE_PIXEL_TO_LOOK = 0
+
+image = ski.imread('OysterImages/Custom/g1_croped_lensecorrected.jpg', as_grey=True)
 #image = image[1:3000, 850:1700] #crop
+#TODO Split image
 
 #image = cv2.GaussianBlur(image,(5,5), 0)
 #pre processing of image
@@ -57,7 +61,7 @@ result_angle_norm = result_angle[0,:,:,0]
 result_red = np.absolute(result_lenght_norm * np.cos(result_angle_norm+4.2))
 result_green = np.absolute(result_lenght_norm * np.cos(result_angle_norm+2.1))
 result_blue = np.absolute(result_lenght_norm * np.cos(result_angle_norm))
-result_rgb = np.zeros((187,208, 3))
+result_rgb = np.zeros((456,716, 3))
 result_rgb[...,0] = (result_red + (np.min(result_red)*-1) ) / (np.min(result_red)*-1 + np.max(result_red))
 result_rgb[...,1] = (result_green + (np.min(result_green)*-1) ) / (np.min(result_green)*-1 + np.max(result_green))
 result_rgb[...,2] = (result_blue + (np.min(result_blue)*-1) ) / (np.min(result_blue)*-1 + np.max(result_blue))
@@ -73,8 +77,8 @@ for vertical_pixel_array in result_rgb: #note the array has 3 wide values, rgb c
     #print(vertical_pixel_array)
     inner_list = []
     for vertical_pixel in vertical_pixel_array:
-        new_pixel_value = np.mean(vertical_pixel)
-        if new_pixel_value < 0.12:
+        new_pixel_value = np.mean(vertical_pixel) #might change this way of converting rgb into a single channel
+        if new_pixel_value < 0.115:
             new_pixel_value = 0
         else:
             new_pixel_value =1
@@ -90,6 +94,7 @@ minor_distance_count = 0
 
 
 # coutning horizontal distances
+hp_max = [0,0,0,0,0] #[distance, outerlistposition, start_innerlist, end_innerlist]
 for hp in filtered_result:
     starting_edge = -1
     ending_edge = -1
@@ -99,12 +104,17 @@ for hp in filtered_result:
     for position, pixel_value in enumerate(hp[:-1]):
         if pixel_value == 1 and hp[position + 1] == 0 and starting_edge == -1:
             starting_edge = position
-        elif pixel_value == 1 and hp[position - 1]==0 and starting_edge != -1:
+        elif pixel_value == 1 and hp[position - 1]== 0 and starting_edge != -1:
             ending_edge = position
             distance = ending_edge - starting_edge
             if distance > 40:
-                hp[starting_edge:ending_edge + 1] = [1] * ((ending_edge + 1) - starting_edge)
+                #hp[starting_edge:ending_edge + 1] = [1] * ((ending_edge + 1) - starting_edge)
                 major_distance_count +=1
+                if distance > hp_max[0]:
+                    hp_max[0] = distance
+                    #hp[starting_edge:ending_edge + 1] = [0.5] * ((ending_edge + 1) - starting_edge)
+                    print("Current Max Distance APM: ", distance)
+
             else:
                 hp[starting_edge:ending_edge + 1] = [0] * ((ending_edge + 1) - starting_edge)
                 minor_distance_count +=1
@@ -115,6 +125,7 @@ for hp in filtered_result:
             hp[position] = 0
 
 #counting vertical distances
+vp_max = [0,0,0,0,0] #[distance, outerlistposition, start_innerlist, end_innerlist]
 for vp in filtered_results_2:
     starting_edge = -1
     ending_edge = -1
@@ -128,8 +139,13 @@ for vp in filtered_results_2:
             ending_edge = position
             distance = ending_edge - starting_edge
             if distance > 40:
-                vp[starting_edge:ending_edge + 1] = [1] * ((ending_edge + 1) - starting_edge)
-                major_distance_count +=1
+                if distance > vp_max[0]:
+                    vp_max[0] = distance
+                    vp[starting_edge:ending_edge + 1] = [1] * ((ending_edge + 1) - starting_edge)
+                    print("Current Max Distance DVM: ", distance)
+                else:
+                    #vp[starting_edge:ending_edge + 1] = [1] * ((ending_edge + 1) - starting_edge)
+                    major_distance_count += 1
             else:
                 vp[starting_edge:ending_edge + 1] = [0] * ((ending_edge + 1) - starting_edge)
                 minor_distance_count +=1
@@ -144,12 +160,14 @@ print("minors: ", minor_distance_count)
 
 filteres_2_transposed = np.array(filtered_results_2).transpose().tolist() #untransposing to make it look good again.
 
+#comabine horizontal and vertical
 for position_main, pixel_main in enumerate(filtered_result):
     for position_idv_pix, pixel_idv_pix in enumerate(pixel_main):
         if pixel_idv_pix == 0:
             if filteres_2_transposed[position_main][position_idv_pix] == 1:
                 pixel_main[position_idv_pix] = 1
 
+#superimposing original image:
 
 
 # printing out results
