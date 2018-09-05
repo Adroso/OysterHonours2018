@@ -12,13 +12,13 @@ def midpoint(ptA, ptB):
 
 
 #load image and specify width of the left most object
-image = cv2.imread('OysterImages/Custom/g1_croped_lensecorrected.jpg')
+image = cv2.imread('OysterImages/CustomFinal/all_cropped.jpg')
 #image = image[1:1000, 850:1700]
 width = 95 #milimeters
 
 height, width = image.shape[:2]
 #pre-processing
-#image = cv2.GaussianBlur(image, (5,5), 0)
+image = cv2.GaussianBlur(image, (5,5), 0)
 #Rotate Image
 
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)

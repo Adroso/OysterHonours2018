@@ -10,9 +10,10 @@ import pandas
 
 PIXEL_TO_LOOK = 1
 INVERSE_PIXEL_TO_LOOK = 0
-DISTANCE_THRESHOLD = 1
+DISTANCE_THRESHOLD = 40
+PIXEL_IGNORE_THRESHOLD = 30
 
-image = ski.imread('OysterImages/CustomFinal/1A_cropped.jpg', as_grey=True)
+image = ski.imread('OysterImages/devided/1.jpg', as_grey=True)
 #image = image[1:3000, 850:1700] #crop
 #TODO Split image
 
@@ -79,7 +80,7 @@ for vertical_pixel_array in result_rgb: #note the array has 3 wide values, rgb c
     inner_list = []
     for vertical_pixel in vertical_pixel_array:
         new_pixel_value = np.mean(vertical_pixel) #might change this way of converting rgb into a single channel
-        if new_pixel_value < 0.115:
+        if new_pixel_value < 0.09:
             new_pixel_value = 0
         else:
             new_pixel_value =1
@@ -87,15 +88,15 @@ for vertical_pixel_array in result_rgb: #note the array has 3 wide values, rgb c
 
     filtered_result.append(inner_list)
     horizontal_pixel_id +=1
-
 filtered_results_2 = np.array(filtered_result).transpose().tolist()
-
+#plt.imshow(filtered_result)
 major_distance_count = 0
 minor_distance_count = 0
 
 
 # coutning horizontal distances
 hp_max = [0,0,0,0,0] #[distance, outerlistposition, start_innerlist, end_innerlist]
+loop_count = 0
 for hp in filtered_result:
     starting_edge = -1
     ending_edge = -1
@@ -111,7 +112,9 @@ for hp in filtered_result:
             if distance > DISTANCE_THRESHOLD:
                 hp[starting_edge:ending_edge + 1] = [1] * ((ending_edge + 1) - starting_edge)
                 major_distance_count +=1
-                if distance > hp_max[0]:
+                if distance > hp_max[0] and loop_count < len(result_red) - PIXEL_IGNORE_THRESHOLD:
+                    print(position)
+                    print(hp)
                     hp_max[0] = distance
                     hp[starting_edge:ending_edge + 1] = [0.5] * ((ending_edge + 1) - starting_edge)
                     print("Current Max Distance APM: ", distance)
@@ -124,9 +127,13 @@ for hp in filtered_result:
             ending_edge = -1
         else:
             hp[position] = 0
-
+    loop_count +=1
+    print(loop_count)
+#plt.imshow(filtered_result)
 #counting vertical distances
+
 vp_max = [0,0,0,0,0] #[distance, outerlistposition, start_innerlist, end_innerlist]
+loop_count_vp = 0
 for vp in filtered_results_2:
     starting_edge = -1
     ending_edge = -1
@@ -140,7 +147,7 @@ for vp in filtered_results_2:
             ending_edge = position
             distance = ending_edge - starting_edge
             if distance > DISTANCE_THRESHOLD:
-                if distance > vp_max[0]:
+                if distance > vp_max[0] and loop_count < len(result_red[0]) - PIXEL_IGNORE_THRESHOLD:
                     vp_max[0] = distance
                     vp[starting_edge:ending_edge + 1] = [1] * ((ending_edge + 1) - starting_edge)
                     print("Current Max Distance DVM: ", distance)
@@ -155,6 +162,8 @@ for vp in filtered_results_2:
             ending_edge = -1
         else:
             vp[position] = 0
+    loop_count_vp += 1
+
 
 print("majors: ", major_distance_count)
 print("minors: ", minor_distance_count)
