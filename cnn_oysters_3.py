@@ -10,6 +10,7 @@ import pandas
 
 PIXEL_TO_LOOK = 1
 INVERSE_PIXEL_TO_LOOK = 0
+DISTANCE_THRESHOLD = 1
 
 image = ski.imread('OysterImages/CustomFinal/1A_cropped.jpg', as_grey=True)
 #image = image[1:3000, 850:1700] #crop
@@ -61,7 +62,7 @@ result_angle_norm = result_angle[0,:,:,0]
 result_red = np.absolute(result_lenght_norm * np.cos(result_angle_norm+4.2))
 result_green = np.absolute(result_lenght_norm * np.cos(result_angle_norm+2.1))
 result_blue = np.absolute(result_lenght_norm * np.cos(result_angle_norm))
-result_rgb = np.zeros((150,156, 3))
+result_rgb = np.zeros((len(result_red),len(result_red[0]), 3))
 result_rgb[...,0] = (result_red + (np.min(result_red)*-1) ) / (np.min(result_red)*-1 + np.max(result_red))
 result_rgb[...,1] = (result_green + (np.min(result_green)*-1) ) / (np.min(result_green)*-1 + np.max(result_green))
 result_rgb[...,2] = (result_blue + (np.min(result_blue)*-1) ) / (np.min(result_blue)*-1 + np.max(result_blue))
@@ -107,7 +108,7 @@ for hp in filtered_result:
         elif pixel_value == PIXEL_TO_LOOK and hp[position - 1]== INVERSE_PIXEL_TO_LOOK and starting_edge != -1:
             ending_edge = position
             distance = ending_edge - starting_edge
-            if distance > 40:
+            if distance > DISTANCE_THRESHOLD:
                 hp[starting_edge:ending_edge + 1] = [1] * ((ending_edge + 1) - starting_edge)
                 major_distance_count +=1
                 if distance > hp_max[0]:
@@ -138,7 +139,7 @@ for vp in filtered_results_2:
         elif pixel_value == PIXEL_TO_LOOK and vp[position - 1]==INVERSE_PIXEL_TO_LOOK and starting_edge != -1:
             ending_edge = position
             distance = ending_edge - starting_edge
-            if distance > 40:
+            if distance > DISTANCE_THRESHOLD:
                 if distance > vp_max[0]:
                     vp_max[0] = distance
                     vp[starting_edge:ending_edge + 1] = [1] * ((ending_edge + 1) - starting_edge)
