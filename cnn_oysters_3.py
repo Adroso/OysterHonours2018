@@ -157,7 +157,7 @@ for vertical_pixel_array in result_rgb: #note the array has 3 wide values, rgb c
     inner_list = []
     for vertical_pixel in vertical_pixel_array:
         new_pixel_value = np.mean(vertical_pixel) #might change this way of converting rgb into a single channel
-        if new_pixel_value < 0.09:
+        if new_pixel_value < 0.079:
             new_pixel_value = 0
         else:
             new_pixel_value =1
@@ -182,8 +182,8 @@ for hp in filtered_result:
     ending_edge = -1
 
     inner_oyster = []
-    gg = 0
-    for position, pixel_value in enumerate(hp):
+
+    for position, pixel_value in enumerate(hp[:-1]):
         if pixel_value == PIXEL_TO_LOOK and hp[position + 1] == INVERSE_PIXEL_TO_LOOK and starting_edge == -1:
             starting_edge = position
         elif pixel_value == PIXEL_TO_LOOK and hp[position - 1]== INVERSE_PIXEL_TO_LOOK and starting_edge != -1:
@@ -194,7 +194,7 @@ for hp in filtered_result:
                 major_distance_count +=1
                 if distance > hp_max[0] and loop_count < len(result_red) - PIXEL_IGNORE_THRESHOLD:
                     hp_max[0] = distance
-                    hp[starting_edge:ending_edge + 1] = [0.5] * ((ending_edge + 1) - starting_edge)
+                    hp[starting_edge:ending_edge + 1] = [0.7] * ((ending_edge + 1) - starting_edge)
                     print("Current Max Distance APM: ", distance)
             else:
                 hp[starting_edge:ending_edge + 1] = [0] * ((ending_edge + 1) - starting_edge)
@@ -204,6 +204,7 @@ for hp in filtered_result:
             ending_edge = -1
         else:
             hp[position] = 0
+
     loop_count +=1
 #plt.imshow(filtered_result)
 
@@ -213,9 +214,8 @@ loop_count_vp = 0
 for vp in filtered_results_2:
     starting_edge = -1
     ending_edge = -1
-
     inner_oyster = []
-    gg = 0
+
     for position, pixel_value in enumerate(vp[:-1]):
         if pixel_value == PIXEL_TO_LOOK and vp[position + 1] == INVERSE_PIXEL_TO_LOOK and starting_edge == -1:
             starting_edge = position
@@ -225,9 +225,7 @@ for vp in filtered_results_2:
             if distance > DISTANCE_THRESHOLD:
                 if distance > vp_max[0]:
                     vp_max[0] = distance
-                    print("I Ran")
-                    print(position)
-                    vp[starting_edge:ending_edge + 1] = [0.5] * ((ending_edge + 1) - starting_edge)
+                    vp[starting_edge:ending_edge + 1] = [0.7] * ((ending_edge + 1) - starting_edge)
                     print("Current Max Distance DVM: ", distance)
                 else:
                     vp[starting_edge:ending_edge + 1] = [1] * ((ending_edge + 1) - starting_edge)
@@ -254,6 +252,10 @@ for position_main, pixel_main in enumerate(filtered_result):
         if pixel_idv_pix == 0:
             if filteres_2_transposed[position_main][position_idv_pix] == 1:
                 pixel_main[position_idv_pix] = 1
+            elif filteres_2_transposed[position_main][position_idv_pix] == 0.7:
+                pixel_main[position_idv_pix] = 0.7
+        elif filteres_2_transposed[position_main][position_idv_pix] == 0.7:
+            pixel_main[position_idv_pix]= 0.7
 
 """END OF PIXEL COUNTING ALGORITHIM SECTION"""
 
