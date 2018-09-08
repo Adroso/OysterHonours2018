@@ -11,6 +11,9 @@ import lensfunpy
 
 #Setting all globals and constants
 
+#THE MAIN ONE
+PIXEL_VALUE_TO_ACTUAL_VALUE_FACTOR = 3
+
 #For pixel counting Algorithim
 PIXEL_TO_LOOK = 1
 INVERSE_PIXEL_TO_LOOK = 0
@@ -22,7 +25,7 @@ cam_maker = 'GoPro'
 cam_model = 'HERO4 Silver'
 lens_maker = 'GoPro'
 lens_model = 'HERO4'
-focal_length = 3
+focal_length = 10
 apperture = 2.97
 
 #For Cropping
@@ -30,15 +33,16 @@ left_crop = 1750
 right_crop = 2500
 top_crop = 400
 bottom_crop = 2900
-NUMBER_OF_OYSTERS_HIGH = 6
+NUMBER_OF_OYSTERS_HIGH = 8
+NUMBER_OF_OYSTERS_WIDE = 2
+# Note built for a max of 2 wide, if this needs to be changed for more than 2 code in the ROI section deeds to be edited
 
 """Actual Code Now"""
-###
-###
-###
-###
+
+
+"""PRE-PROCESSING SECTION"""
 #Reading Image
-raw_image = cv2.imread('OysterImages/CustomFinal/GOPR0005.JPG')
+raw_image = cv2.imread('OysterImages/1 (21).JPG')
 grey_image = cv2.cvtColor(raw_image, cv2.COLOR_BGR2GRAY)
 height, width = grey_image.shape[0], grey_image.shape[1]
 
@@ -51,6 +55,7 @@ mod = lensfunpy.Modifier(lens, cam.crop_factor, width, height)
 mod.initialize(focal_length, apperture, 1)
 undist_coords = mod.apply_geometry_distortion()
 grey_image_undistorted = cv2.remap(grey_image, undist_coords, None, cv2.INTER_LANCZOS4)
+#grey_image_undistorted = cv2.GaussianBlur(grey_image_undistorted,(5,5), 0)
 
 #Rotation Correction
 if width > height: #if image is landscape (meaning oyster hinges are sideways)
@@ -60,24 +65,37 @@ if width > height: #if image is landscape (meaning oyster hinges are sideways)
 else:
     grey_rotated_undistort_image = grey_image_undistorted
 
-#Region of Intrest 1
-image2 = grey_rotated_undistort_image[top_crop:bottom_crop, left_crop:right_crop] #crop
-#[top:bottom, left:right ]
+#Region of Interest 1
+full_pre_processed_image = grey_rotated_undistort_image[top_crop:bottom_crop, left_crop:right_crop] #crop
+#[top:bottom, left:right]
 
-seperated_oyster_images = []
-#TODO Split image
+#Region of Interest 2
+separated_oyster_images = {}
+cropped_h, cropped_w = full_pre_processed_image.shape[0], full_pre_processed_image.shape[1]
+roi_grid_h_factor = int(cropped_h/NUMBER_OF_OYSTERS_HIGH)
+roi_grid_w_factor = int(cropped_w/NUMBER_OF_OYSTERS_WIDE)
+
+roi_counter = 0 #starts at 1 to allow multipication of it, make sure the condition is a < number+1
+while roi_counter < NUMBER_OF_OYSTERS_HIGH:
+    separated_oyster_images[str(roi_counter) + 'A'] = full_pre_processed_image[(roi_grid_h_factor*roi_counter):(roi_grid_h_factor*(roi_counter+1)), 0:roi_grid_w_factor]
+    separated_oyster_images[str(roi_counter) + 'B'] = full_pre_processed_image[(roi_grid_h_factor*roi_counter):(roi_grid_h_factor*(roi_counter+1)), roi_grid_w_factor:]
+    roi_counter+=1
 
 
-oyster1 = image2[0:416, 0:375]
-oyster2 = image2[0:416, 375: ]
-oyster3 = image2[416:832, 0:375]
-
-#image = cv2.GaussianBlur(image,(5,5), 0)
-#pre processing of image
-plt.imshow(oyster3)
+#show an image
+#plt.imshow(separated_oyster_images['4B'])
+plt.imshow(grey_rotated_undistort_image)
 plt.show()
 tf.reset_default_graph()
 
+"""END OF PRE-PROCESSING SECTION"""
+
+"""FOR THE PURPOSE OF RUNNING WHILE TESTING
+SPECIFYING 1 OYSTER HERE"""
+
+
+
+"""CNN EDGE DETECTION SECTION"""
 # Write the kernel weights as a 2D array.
 kernel_h = np.array([3, 3])
 kernel_h = [ [-1,-2,-1], [0,0,0], [1,2,1] ]
@@ -112,7 +130,7 @@ plt.imshow(result_lenght[0, :, :, 0], cmap='hot')
 result_angle = (np.arctan(result_v/(result_h+0.00000001)))#*(2*math.pi)
 plt.imshow(result_angle[0, :, :, 0], cmap='hot')
 
-#normalize like crazy
+
 result_lenght_norm = (result_lenght[0,:,:,0] + (np.min(result_lenght)*-1) ) / (np.min(result_lenght)*-1 + np.max(result_lenght))
 result_angle_norm = result_angle[0,:,:,0]
 result_red = np.absolute(result_lenght_norm * np.cos(result_angle_norm+4.2))
@@ -122,8 +140,11 @@ result_rgb = np.zeros((len(result_red),len(result_red[0]), 3))
 result_rgb[...,0] = (result_red + (np.min(result_red)*-1) ) / (np.min(result_red)*-1 + np.max(result_red))
 result_rgb[...,1] = (result_green + (np.min(result_green)*-1) ) / (np.min(result_green)*-1 + np.max(result_green))
 result_rgb[...,2] = (result_blue + (np.min(result_blue)*-1) ) / (np.min(result_blue)*-1 + np.max(result_blue))
-#result_rgb
 
+
+"""END OF CNN-EDGE DECTECTION SECTION"""
+
+"""FILTERING WEAK EDGES SECTION"""
 #filtering the list for stronger values
 horizontal_pixel_id = 0
 vertical_pixel_id = 0
@@ -145,9 +166,12 @@ for vertical_pixel_array in result_rgb: #note the array has 3 wide values, rgb c
     horizontal_pixel_id +=1
 filtered_results_2 = np.array(filtered_result).transpose().tolist()
 #plt.imshow(filtered_result)
+"""END OF FILTERING EDGES SECTION"""
+
+
+"""PIXEL COUNTING ALGORITHIM SECTION"""
 major_distance_count = 0
 minor_distance_count = 0
-
 
 # coutning horizontal distances
 hp_max = [0,0,0,0,0] #[distance, outerlistposition, start_innerlist, end_innerlist]
@@ -171,7 +195,6 @@ for hp in filtered_result:
                     hp_max[0] = distance
                     hp[starting_edge:ending_edge + 1] = [0.5] * ((ending_edge + 1) - starting_edge)
                     print("Current Max Distance APM: ", distance)
-
             else:
                 hp[starting_edge:ending_edge + 1] = [0] * ((ending_edge + 1) - starting_edge)
                 minor_distance_count +=1
@@ -182,8 +205,8 @@ for hp in filtered_result:
             hp[position] = 0
     loop_count +=1
 #plt.imshow(filtered_result)
-#counting vertical distances
 
+#counting vertical distances
 vp_max = [0,0,0,0,0] #[distance, outerlistposition, start_innerlist, end_innerlist]
 loop_count_vp = 0
 for vp in filtered_results_2:
@@ -230,6 +253,10 @@ for position_main, pixel_main in enumerate(filtered_result):
         if pixel_idv_pix == 0:
             if filteres_2_transposed[position_main][position_idv_pix] == 1:
                 pixel_main[position_idv_pix] = 1
+
+"""END OF PIXEL COUNTING ALGORITHIM SECTION"""
+
+
 
 #superimposing original image:
 
