@@ -176,8 +176,9 @@ minor_distance_count = 0
 
 # coutning horizontal distances
 hp_max = [0,0,0,0,0] #[distance, outerlistposition, start_innerlist, end_innerlist]
+test_max = []
 loop_count = 0
-for hp in filtered_result:
+for po, hp in enumerate(filtered_result):
     starting_edge = -1
     ending_edge = -1
 
@@ -196,6 +197,7 @@ for hp in filtered_result:
                     hp_max[0] = distance
                     hp[starting_edge:ending_edge + 1] = [0.7] * ((ending_edge + 1) - starting_edge)
                     print("Current Max Distance APM: ", distance)
+                    test_max = [po,starting_edge, ending_edge]
             else:
                 hp[starting_edge:ending_edge + 1] = [0] * ((ending_edge + 1) - starting_edge)
                 minor_distance_count +=1
@@ -206,12 +208,15 @@ for hp in filtered_result:
             hp[position] = 0
 
     loop_count +=1
+
+print(test_max)
 #plt.imshow(filtered_result)
 
 #counting vertical distances
 vp_max = [0,0,0,0,0] #[distance, outerlistposition, start_innerlist, end_innerlist]
+test_max_2 = []
 loop_count_vp = 0
-for vp in filtered_results_2:
+for vp_po, vp in enumerate(filtered_results_2):
     starting_edge = -1
     ending_edge = -1
     inner_oyster = []
@@ -227,6 +232,7 @@ for vp in filtered_results_2:
                     vp_max[0] = distance
                     vp[starting_edge:ending_edge + 1] = [0.7] * ((ending_edge + 1) - starting_edge)
                     print("Current Max Distance DVM: ", distance)
+                    test_max_2 = [vp_po, starting_edge, ending_edge]
                 else:
                     vp[starting_edge:ending_edge + 1] = [1] * ((ending_edge + 1) - starting_edge)
                     major_distance_count += 1
@@ -259,15 +265,23 @@ for position_main, pixel_main in enumerate(filtered_result):
 
 """END OF PIXEL COUNTING ALGORITHIM SECTION"""
 
+"""START FINAL RESULTS"""
 
+#APM
+f_height, f_width = result_rgb.shape[0], result_rgb.shape[1]
+final = cv2.resize(image,(f_width, f_height))
+final[test_max[0]][test_max[1]:test_max[2]] = 1
 
-#superimposing original image:
-
+#DVM
+for_dvm = np.array(final).transpose()
+for_dvm[test_max_2[0]][test_max_2[1]:test_max_2[2]] = 1
+actual_final = np.array(for_dvm).transpose().tolist()
+plt.imshow(actual_final)
 
 # printing out results
 #plt.imshow(oysters)
 #plt.imshow(filtered_results_2)
 #plt.imshow(filteres_2_transposed)
-plt.imshow(filtered_result)
+#plt.imshow(filtered_result)
 
 plt.show()
