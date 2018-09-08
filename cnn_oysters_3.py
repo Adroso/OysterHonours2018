@@ -7,19 +7,74 @@ import matplotlib.pyplot as plt
 import math
 import cv2
 import pandas
+import lensfunpy
 
+#Setting all globals and constants
+
+#For pixel counting Algorithim
 PIXEL_TO_LOOK = 1
 INVERSE_PIXEL_TO_LOOK = 0
 DISTANCE_THRESHOLD = 40
 PIXEL_IGNORE_THRESHOLD = 30
 
-image = ski.imread('OysterImages/devided/1.jpg', as_grey=True)
-#image = image[1:3000, 850:1700] #crop
+#For Lens Correction
+cam_maker = 'GoPro'
+cam_model = 'HERO4 Silver'
+lens_maker = 'GoPro'
+lens_model = 'HERO4'
+focal_length = 3
+apperture = 2.97
+
+#For Cropping
+left_crop = 1750
+right_crop = 2500
+top_crop = 400
+bottom_crop = 2900
+NUMBER_OF_OYSTERS_HIGH = 6
+
+"""Actual Code Now"""
+###
+###
+###
+###
+#Reading Image
+raw_image = cv2.imread('OysterImages/CustomFinal/GOPR0005.JPG')
+grey_image = cv2.cvtColor(raw_image, cv2.COLOR_BGR2GRAY)
+height, width = grey_image.shape[0], grey_image.shape[1]
+
+
+#Lens Correction
+db = lensfunpy.Database()
+cam = db.find_cameras(cam_maker, cam_model)[0]
+lens = db.find_lenses(cam, lens_maker, lens_model)[0]
+mod = lensfunpy.Modifier(lens, cam.crop_factor, width, height)
+mod.initialize(focal_length, apperture, 1)
+undist_coords = mod.apply_geometry_distortion()
+grey_image_undistorted = cv2.remap(grey_image, undist_coords, None, cv2.INTER_LANCZOS4)
+
+#Rotation Correction
+if width > height: #if image is landscape (meaning oyster hinges are sideways)
+    rows, cols = grey_image_undistorted.shape
+    rotation_matrix = cv2.getRotationMatrix2D((cols/2,rows/2),270,1)
+    grey_rotated_undistort_image = cv2.warpAffine(grey_image_undistorted, rotation_matrix, (cols, rows))
+else:
+    grey_rotated_undistort_image = grey_image_undistorted
+
+#Region of Intrest 1
+image2 = grey_rotated_undistort_image[top_crop:bottom_crop, left_crop:right_crop] #crop
+#[top:bottom, left:right ]
+
+seperated_oyster_images = []
 #TODO Split image
+
+
+oyster1 = image2[0:416, 0:375]
+oyster2 = image2[0:416, 375: ]
+oyster3 = image2[416:832, 0:375]
 
 #image = cv2.GaussianBlur(image,(5,5), 0)
 #pre processing of image
-plt.imshow(image)
+plt.imshow(oyster3)
 plt.show()
 tf.reset_default_graph()
 
@@ -113,8 +168,6 @@ for hp in filtered_result:
                 hp[starting_edge:ending_edge + 1] = [1] * ((ending_edge + 1) - starting_edge)
                 major_distance_count +=1
                 if distance > hp_max[0] and loop_count < len(result_red) - PIXEL_IGNORE_THRESHOLD:
-                    print(position)
-                    print(hp)
                     hp_max[0] = distance
                     hp[starting_edge:ending_edge + 1] = [0.5] * ((ending_edge + 1) - starting_edge)
                     print("Current Max Distance APM: ", distance)
@@ -128,7 +181,6 @@ for hp in filtered_result:
         else:
             hp[position] = 0
     loop_count +=1
-    print(loop_count)
 #plt.imshow(filtered_result)
 #counting vertical distances
 
@@ -147,9 +199,11 @@ for vp in filtered_results_2:
             ending_edge = position
             distance = ending_edge - starting_edge
             if distance > DISTANCE_THRESHOLD:
-                if distance > vp_max[0] and loop_count < len(result_red[0]) - PIXEL_IGNORE_THRESHOLD:
+                if distance > vp_max[0]:
                     vp_max[0] = distance
-                    vp[starting_edge:ending_edge + 1] = [1] * ((ending_edge + 1) - starting_edge)
+                    print("I Ran")
+                    print(position)
+                    vp[starting_edge:ending_edge + 1] = [0.5] * ((ending_edge + 1) - starting_edge)
                     print("Current Max Distance DVM: ", distance)
                 else:
                     vp[starting_edge:ending_edge + 1] = [1] * ((ending_edge + 1) - starting_edge)
