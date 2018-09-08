@@ -30,7 +30,7 @@ apperture = 2.97
 
 #For Cropping
 left_crop = 860
-right_crop = 1650
+right_crop = 1600
 top_crop = 50
 bottom_crop = 2900
 NUMBER_OF_OYSTERS_HIGH = 8
@@ -42,7 +42,7 @@ NUMBER_OF_OYSTERS_WIDE = 2
 
 """PRE-PROCESSING SECTION"""
 #Reading Image
-raw_image = cv2.imread('OysterImages/1 (21).JPG')
+raw_image = cv2.imread('OysterImages/1 (24).JPG')
 grey_image = cv2.cvtColor(raw_image, cv2.COLOR_BGR2GRAY)
 height, width = grey_image.shape[0], grey_image.shape[1]
 
@@ -55,7 +55,9 @@ mod = lensfunpy.Modifier(lens, cam.crop_factor, width, height)
 mod.initialize(focal_length, apperture, 1)
 undist_coords = mod.apply_geometry_distortion()
 grey_image_undistorted = cv2.remap(grey_image, undist_coords, None, cv2.INTER_LANCZOS4)
-#grey_image_undistorted = cv2.GaussianBlur(grey_image_undistorted,(5,5), 0)
+
+#Blur
+grey_image_undistorted = cv2.GaussianBlur(grey_image_undistorted,(5,5), 1)
 
 #Rotation Correction
 if width > height: #if image is landscape (meaning oyster hinges are sideways)
@@ -83,7 +85,7 @@ while roi_counter < NUMBER_OF_OYSTERS_HIGH:
 
 
 #show an image
-plt.imshow(separated_oyster_images['7A'])
+plt.imshow(separated_oyster_images['1A'])
 plt.show()
 tf.reset_default_graph()
 
@@ -92,7 +94,7 @@ tf.reset_default_graph()
 """FOR THE PURPOSE OF RUNNING WHILE TESTING
 SPECIFYING 1 OYSTER HERE"""
 
-
+image = separated_oyster_images['1A']
 
 """CNN EDGE DETECTION SECTION"""
 # Write the kernel weights as a 2D array.
@@ -181,7 +183,7 @@ for hp in filtered_result:
 
     inner_oyster = []
     gg = 0
-    for position, pixel_value in enumerate(hp[:-1]):
+    for position, pixel_value in enumerate(hp):
         if pixel_value == PIXEL_TO_LOOK and hp[position + 1] == INVERSE_PIXEL_TO_LOOK and starting_edge == -1:
             starting_edge = position
         elif pixel_value == PIXEL_TO_LOOK and hp[position - 1]== INVERSE_PIXEL_TO_LOOK and starting_edge != -1:
