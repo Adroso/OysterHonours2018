@@ -85,7 +85,7 @@ while roi_counter < NUMBER_OF_OYSTERS_HIGH:
 
 
 #show an image
-plt.imshow(separated_oyster_images['1A'])
+plt.imshow(separated_oyster_images['2A'])
 plt.show()
 tf.reset_default_graph()
 
@@ -94,7 +94,7 @@ tf.reset_default_graph()
 """FOR THE PURPOSE OF RUNNING WHILE TESTING
 SPECIFYING 1 OYSTER HERE"""
 
-image = separated_oyster_images['1A']
+image = separated_oyster_images['2A']
 
 """CNN EDGE DETECTION SECTION"""
 # Write the kernel weights as a 2D array.
@@ -157,7 +157,7 @@ for vertical_pixel_array in result_rgb: #note the array has 3 wide values, rgb c
     inner_list = []
     for vertical_pixel in vertical_pixel_array:
         new_pixel_value = np.mean(vertical_pixel) #might change this way of converting rgb into a single channel
-        if new_pixel_value < 0.079:
+        if new_pixel_value < 0.04: #lower is let more detail, higher reduces detail
             new_pixel_value = 0
         else:
             new_pixel_value =1
@@ -166,7 +166,8 @@ for vertical_pixel_array in result_rgb: #note the array has 3 wide values, rgb c
     filtered_result.append(inner_list)
     horizontal_pixel_id +=1
 filtered_results_2 = np.array(filtered_result).transpose().tolist()
-#plt.imshow(filtered_result)
+# plt.imshow(filtered_result)
+# plt.show()
 """END OF FILTERING EDGES SECTION"""
 
 
@@ -174,26 +175,35 @@ filtered_results_2 = np.array(filtered_result).transpose().tolist()
 major_distance_count = 0
 minor_distance_count = 0
 
+def list_check_remaining(list_to_check, threshold):
+    for x in list_to_check:
+        if x > threshold:
+            return False
+        return True
+
+plt.imshow(filtered_result)
+plt.show()
+
 # coutning horizontal distances
-hp_max = [0,0,0,0,0] #[distance, outerlistposition, start_innerlist, end_innerlist]
-test_max = []
+hp_max = [0] #[distance, outerlistposition, start_innerlist, end_innerlist]
+test_max = [0,0,0]
 loop_count = 0
 for po, hp in enumerate(filtered_result):
     starting_edge = -1
     ending_edge = -1
 
-    inner_oyster = []
-
     for position, pixel_value in enumerate(hp[:-1]):
-        if pixel_value == PIXEL_TO_LOOK and hp[position + 1] == INVERSE_PIXEL_TO_LOOK and starting_edge == -1:
+        if pixel_value == PIXEL_TO_LOOK and list_check_remaining(hp[:position], 0) and starting_edge == -1:
             starting_edge = position
-        elif pixel_value == PIXEL_TO_LOOK and hp[position - 1]== INVERSE_PIXEL_TO_LOOK and starting_edge != -1:
+
+        elif pixel_value == PIXEL_TO_LOOK and list_check_remaining(hp[position+1:], 0) and starting_edge != -1:
             ending_edge = position
             distance = ending_edge - starting_edge
             if distance > DISTANCE_THRESHOLD:
+                print(distance)
                 hp[starting_edge:ending_edge + 1] = [1] * ((ending_edge + 1) - starting_edge)
                 major_distance_count +=1
-                if distance > hp_max[0] and loop_count < len(result_red) - PIXEL_IGNORE_THRESHOLD:
+                if distance > hp_max[0] and loop_count < len(result_red):
                     hp_max[0] = distance
                     hp[starting_edge:ending_edge + 1] = [0.7] * ((ending_edge + 1) - starting_edge)
                     print("Current Max Distance APM: ", distance)
@@ -209,22 +219,18 @@ for po, hp in enumerate(filtered_result):
 
     loop_count +=1
 
-print(test_max)
-#plt.imshow(filtered_result)
-
 #counting vertical distances
-vp_max = [0,0,0,0,0] #[distance, outerlistposition, start_innerlist, end_innerlist]
-test_max_2 = []
+vp_max = [0] #[distance, outerlistposition, start_innerlist, end_innerlist]
+test_max_2 = [0,0,0]
 loop_count_vp = 0
 for vp_po, vp in enumerate(filtered_results_2):
     starting_edge = -1
     ending_edge = -1
-    inner_oyster = []
 
     for position, pixel_value in enumerate(vp[:-1]):
-        if pixel_value == PIXEL_TO_LOOK and vp[position + 1] == INVERSE_PIXEL_TO_LOOK and starting_edge == -1:
+        if pixel_value == PIXEL_TO_LOOK and list_check_remaining(vp[:position], 0) and starting_edge == -1:
             starting_edge = position
-        elif pixel_value == PIXEL_TO_LOOK and vp[position - 1]==INVERSE_PIXEL_TO_LOOK and starting_edge != -1:
+        elif pixel_value == PIXEL_TO_LOOK and list_check_remaining(vp[position+1:], 0) and starting_edge != -1:
             ending_edge = position
             distance = ending_edge - starting_edge
             if distance > DISTANCE_THRESHOLD:
@@ -253,20 +259,21 @@ print("minors: ", minor_distance_count)
 filteres_2_transposed = np.array(filtered_results_2).transpose().tolist() #untransposing to make it look good again.
 
 #comabine horizontal and vertical
-for position_main, pixel_main in enumerate(filtered_result):
-    for position_idv_pix, pixel_idv_pix in enumerate(pixel_main):
-        if pixel_idv_pix == 0:
-            if filteres_2_transposed[position_main][position_idv_pix] == 1:
-                pixel_main[position_idv_pix] = 1
-            elif filteres_2_transposed[position_main][position_idv_pix] == 0.7:
-                pixel_main[position_idv_pix] = 0.7
-        elif filteres_2_transposed[position_main][position_idv_pix] == 0.7:
-            pixel_main[position_idv_pix]= 0.7
+# for position_main, pixel_main in enumerate(filtered_result):
+#     for position_idv_pix, pixel_idv_pix in enumerate(pixel_main):
+#         if pixel_idv_pix == 0:
+#             if filteres_2_transposed[position_main][position_idv_pix] == 1:
+#                 pixel_main[position_idv_pix] = 1
+#             elif filteres_2_transposed[position_main][position_idv_pix] == 0.7:
+#                 pixel_main[position_idv_pix] = 0.7
+#         elif filteres_2_transposed[position_main][position_idv_pix] == 0.7:
+#             pixel_main[position_idv_pix]= 0.7
 
 """END OF PIXEL COUNTING ALGORITHIM SECTION"""
 
 """START FINAL RESULTS"""
-
+print(test_max)
+print(test_max_2)
 #APM
 f_height, f_width = result_rgb.shape[0], result_rgb.shape[1]
 final = cv2.resize(image,(f_width, f_height))

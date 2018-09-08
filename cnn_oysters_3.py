@@ -12,7 +12,7 @@ import lensfunpy
 #Setting all globals and constants
 
 #THE MAIN ONE
-PIXEL_VALUE_TO_ACTUAL_VALUE_FACTOR = 3
+PIXEL_VALUE_TO_ACTUAL_VALUE_FACTOR = 0.11
 
 #For pixel counting Algorithim
 PIXEL_TO_LOOK = 1
@@ -25,15 +25,15 @@ cam_maker = 'GoPro'
 cam_model = 'HERO4 Silver'
 lens_maker = 'GoPro'
 lens_model = 'HERO4'
-focal_length = 3
+focal_length = 5
 apperture = 2.97
 
 #For Cropping
-left_crop = 1750
-right_crop = 2500
-top_crop = 400
+left_crop = 900
+right_crop = 1600
+top_crop = 50
 bottom_crop = 2900
-NUMBER_OF_OYSTERS_HIGH = 6
+NUMBER_OF_OYSTERS_HIGH = 8
 NUMBER_OF_OYSTERS_WIDE = 2
 # Note built for a max of 2 wide, if this needs to be changed for more than 2 code in the ROI section deeds to be edited
 
@@ -42,7 +42,7 @@ NUMBER_OF_OYSTERS_WIDE = 2
 
 """PRE-PROCESSING SECTION"""
 #Reading Image
-raw_image = cv2.imread('OysterImages/CustomFinal/GOPR0005.JPG')
+raw_image = cv2.imread('OysterImages/1 (20).JPG')
 grey_image = cv2.cvtColor(raw_image, cv2.COLOR_BGR2GRAY)
 height, width = grey_image.shape[0], grey_image.shape[1]
 
@@ -175,8 +175,8 @@ major_distance_count = 0
 minor_distance_count = 0
 
 # coutning horizontal distances
-hp_max = [0,0,0,0,0] #[distance, outerlistposition, start_innerlist, end_innerlist]
-test_max = []
+hp_max = [0] #[distance, outerlistposition, start_innerlist, end_innerlist]
+test_max = [0,0,0,0]
 loop_count = 0
 for po, hp in enumerate(filtered_result):
     starting_edge = -1
@@ -196,8 +196,8 @@ for po, hp in enumerate(filtered_result):
                 if distance > hp_max[0] and loop_count < len(result_red) - PIXEL_IGNORE_THRESHOLD:
                     hp_max[0] = distance
                     hp[starting_edge:ending_edge + 1] = [0.7] * ((ending_edge + 1) - starting_edge)
-                    print("Current Max Distance APM: ", distance)
-                    test_max = [po,starting_edge, ending_edge]
+                    #print("Current Max Distance APM: ", distance)
+                    test_max = [po,starting_edge, ending_edge, distance]
             else:
                 hp[starting_edge:ending_edge + 1] = [0] * ((ending_edge + 1) - starting_edge)
                 minor_distance_count +=1
@@ -209,12 +209,12 @@ for po, hp in enumerate(filtered_result):
 
     loop_count +=1
 
-print(test_max)
+#rint(test_max)
 #plt.imshow(filtered_result)
 
 #counting vertical distances
-vp_max = [0,0,0,0,0] #[distance, outerlistposition, start_innerlist, end_innerlist]
-test_max_2 = []
+vp_max = [0] #[distance, outerlistposition, start_innerlist, end_innerlist]
+test_max_2 = [0,0,0,0]
 loop_count_vp = 0
 for vp_po, vp in enumerate(filtered_results_2):
     starting_edge = -1
@@ -231,8 +231,8 @@ for vp_po, vp in enumerate(filtered_results_2):
                 if distance > vp_max[0]:
                     vp_max[0] = distance
                     vp[starting_edge:ending_edge + 1] = [0.7] * ((ending_edge + 1) - starting_edge)
-                    print("Current Max Distance DVM: ", distance)
-                    test_max_2 = [vp_po, starting_edge, ending_edge]
+                    #print("Current Max Distance DVM: ", distance)
+                    test_max_2 = [vp_po, starting_edge, ending_edge, distance]
                 else:
                     vp[starting_edge:ending_edge + 1] = [1] * ((ending_edge + 1) - starting_edge)
                     major_distance_count += 1
@@ -272,9 +272,15 @@ f_height, f_width = result_rgb.shape[0], result_rgb.shape[1]
 final = cv2.resize(image,(f_width, f_height))
 final[test_max[0]][test_max[1]:test_max[2]] = 1
 
+apm = test_max[3]*PIXEL_VALUE_TO_ACTUAL_VALUE_FACTOR
+print("This Oyster's APM is: " + str(apm) + "CM")
 #DVM
 for_dvm = np.array(final).transpose()
 for_dvm[test_max_2[0]][test_max_2[1]:test_max_2[2]] = 1
+
+dvm = test_max_2[3]*PIXEL_VALUE_TO_ACTUAL_VALUE_FACTOR
+print("This Oyster's DVM is: " + str(dvm) + "CM")
+
 actual_final = np.array(for_dvm).transpose().tolist()
 plt.imshow(actual_final)
 
