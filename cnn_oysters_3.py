@@ -25,13 +25,13 @@ cam_maker = 'GoPro'
 cam_model = 'HERO4 Silver'
 lens_maker = 'GoPro'
 lens_model = 'HERO4'
-focal_length = 10
+focal_length = 5
 apperture = 2.97
 
 #For Cropping
-left_crop = 1750
-right_crop = 2500
-top_crop = 400
+left_crop = 860
+right_crop = 1650
+top_crop = 50
 bottom_crop = 2900
 NUMBER_OF_OYSTERS_HIGH = 8
 NUMBER_OF_OYSTERS_WIDE = 2
@@ -83,8 +83,7 @@ while roi_counter < NUMBER_OF_OYSTERS_HIGH:
 
 
 #show an image
-#plt.imshow(separated_oyster_images['4B'])
-plt.imshow(grey_rotated_undistort_image)
+plt.imshow(separated_oyster_images['7A'])
 plt.show()
 tf.reset_default_graph()
 
