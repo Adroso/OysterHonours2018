@@ -29,10 +29,10 @@ focal_length = 5
 apperture = 2.97
 
 #For Cropping
-left_crop = 900
+left_crop = 910
 right_crop = 1600
 top_crop = 50
-bottom_crop = 2900
+bottom_crop = 2800
 NUMBER_OF_OYSTERS_HIGH = 8
 NUMBER_OF_OYSTERS_WIDE = 2
 # Note built for a max of 2 wide, if this needs to be changed for more than 2 code in the ROI section deeds to be edited
@@ -42,7 +42,7 @@ NUMBER_OF_OYSTERS_WIDE = 2
 
 """PRE-PROCESSING SECTION"""
 #Reading Image
-raw_image = cv2.imread('OysterImages/1 (20).JPG')
+raw_image = cv2.imread('OysterImages/1 (22).JPG')
 grey_image = cv2.cvtColor(raw_image, cv2.COLOR_BGR2GRAY)
 height, width = grey_image.shape[0], grey_image.shape[1]
 
@@ -70,6 +70,8 @@ else:
 #Region of Interest 1
 full_pre_processed_image = grey_rotated_undistort_image[top_crop:bottom_crop, left_crop:right_crop] #crop
 #[top:bottom, left:right]
+plt.imshow(full_pre_processed_image)
+plt.show()
 
 #Region of Interest 2
 separated_oyster_images = {}
@@ -85,7 +87,7 @@ while roi_counter < NUMBER_OF_OYSTERS_HIGH:
 
 
 #show an image
-plt.imshow(separated_oyster_images['1A'])
+plt.imshow(separated_oyster_images['6B'])
 plt.show()
 tf.reset_default_graph()
 
@@ -94,7 +96,7 @@ tf.reset_default_graph()
 """FOR THE PURPOSE OF RUNNING WHILE TESTING
 SPECIFYING 1 OYSTER HERE"""
 
-image = separated_oyster_images['1A']
+image = separated_oyster_images['6B']
 
 """CNN EDGE DETECTION SECTION"""
 # Write the kernel weights as a 2D array.
@@ -273,13 +275,13 @@ final = cv2.resize(image,(f_width, f_height))
 final[test_max[0]][test_max[1]:test_max[2]] = 1
 
 apm = test_max[3]*PIXEL_VALUE_TO_ACTUAL_VALUE_FACTOR
-print("This Oyster's APM is: " + str(apm) + "CM")
+print("This Oyster's APM is: " + str(apm) + "CM" + " Or: "+ str(test_max[3])+ " pixels")
 #DVM
 for_dvm = np.array(final).transpose()
 for_dvm[test_max_2[0]][test_max_2[1]:test_max_2[2]] = 1
 
 dvm = test_max_2[3]*PIXEL_VALUE_TO_ACTUAL_VALUE_FACTOR
-print("This Oyster's DVM is: " + str(dvm) + "CM")
+print("This Oyster's DVM is: " + str(dvm) + "CM" + " Or: "+ str(test_max_2[3])+ " pixels")
 
 actual_final = np.array(for_dvm).transpose().tolist()
 plt.imshow(actual_final)
