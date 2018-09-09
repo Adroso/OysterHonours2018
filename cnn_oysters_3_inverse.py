@@ -12,7 +12,7 @@ import lensfunpy
 #Setting all globals and constants
 
 #THE MAIN ONE
-PIXEL_VALUE_TO_ACTUAL_VALUE_FACTOR = 3
+PIXEL_VALUE_TO_ACTUAL_VALUE_FACTOR = 0.1
 
 #For pixel counting Algorithim
 PIXEL_TO_LOOK = 1
@@ -184,15 +184,6 @@ def list_check_remaining(list_to_check, threshold):
 plt.imshow(filtered_result)
 plt.show()
 
-for pixi_pos, pixi_row in enumerate(filtered_result):
-    for pixi_pos,pixi in enumerate(pixi_row):
-        if pixi == 0:
-            pixi_row[pixi_pos] =1
-        elif pixi == 1:
-            pixi_row[pixi_pos] =0
-
-plt.imshow(filtered_result)
-plt.show()
 # coutning horizontal distances
 hp_max = [0] #[distance, outerlistposition, start_innerlist, end_innerlist]
 test_max = [0,0,0,0]
@@ -200,14 +191,18 @@ loop_count = 0
 for po, hp in enumerate(filtered_result):
     starting_edge = -1
     ending_edge = -1
-
+    live_position = -1
     inner_oyster = []
 
     for position, pixel_value in enumerate(hp[:-1]):
-        if pixel_value == PIXEL_TO_LOOK and hp[position + 1] == INVERSE_PIXEL_TO_LOOK and starting_edge == -1:
+        if pixel_value == PIXEL_TO_LOOK and starting_edge == -1 and position not in [0,1,2,3,4]:
             starting_edge = position
-        elif pixel_value == PIXEL_TO_LOOK and hp[position - 1]== INVERSE_PIXEL_TO_LOOK and starting_edge != -1:
-            ending_edge = position
+
+        elif pixel_value == PIXEL_TO_LOOK and starting_edge != -1:
+            live_position = position
+
+        elif position == len(hp[:-1]) - 1:
+            ending_edge = live_position
             distance = ending_edge - starting_edge
             if distance > DISTANCE_THRESHOLD:
                 hp[starting_edge:ending_edge + 1] = [1] * ((ending_edge + 1) - starting_edge)
@@ -223,32 +218,42 @@ for po, hp in enumerate(filtered_result):
 
             starting_edge = -1
             ending_edge = -1
+            live_position = -1
         else:
             hp[position] = 0
 
     loop_count +=1
-plt.imshow(filtered_result)
-plt.show()
+
+
+# plt.imshow(filtered_result)
+# plt.show()
+
+
 #counting vertical distances
 vp_max = [0] #[distance, outerlistposition, start_innerlist, end_innerlist]
-test_max_2 = [0,0,0]
+test_max_2 = [0,0,0,0]
 loop_count_vp = 0
+
 for vp_po, vp in enumerate(filtered_results_2):
     starting_edge = -1
     ending_edge = -1
+    live_position_vp = -1
 
     for position, pixel_value in enumerate(vp[:-1]):
-        if pixel_value == PIXEL_TO_LOOK and list_check_remaining(vp[:position], 0) and starting_edge == -1:
+        if pixel_value == PIXEL_TO_LOOK and starting_edge == -1 and position not in [-1,0,1,2,3,4]:
             starting_edge = position
-        elif pixel_value == PIXEL_TO_LOOK and list_check_remaining(vp[position+1:], 0) and starting_edge != -1:
+        elif pixel_value == PIXEL_TO_LOOK and starting_edge != -1:
+            live_position_vp = position
+
+        elif position == len(vp[:-1]) - 1:
             ending_edge = position
             distance = ending_edge - starting_edge
             if distance > DISTANCE_THRESHOLD:
                 if distance > vp_max[0]:
                     vp_max[0] = distance
                     vp[starting_edge:ending_edge + 1] = [0.7] * ((ending_edge + 1) - starting_edge)
-                    print("Current Max Distance DVM: ", distance)
-                    test_max_2 = [vp_po, starting_edge, ending_edge]
+                    #print("Current Max Distance DVM: ", distance)
+                    test_max_2 = [vp_po, starting_edge, ending_edge, distance]
                 else:
                     vp[starting_edge:ending_edge + 1] = [1] * ((ending_edge + 1) - starting_edge)
                     major_distance_count += 1
@@ -258,6 +263,7 @@ for vp_po, vp in enumerate(filtered_results_2):
 
             starting_edge = -1
             ending_edge = -1
+            live_position_vp = -1
         else:
             vp[position] = 0
     loop_count_vp += 1
@@ -289,9 +295,15 @@ f_height, f_width = result_rgb.shape[0], result_rgb.shape[1]
 final = cv2.resize(image,(f_width, f_height))
 final[test_max[0]][test_max[1]:test_max[2]] = 1
 
+apm = test_max[3]*PIXEL_VALUE_TO_ACTUAL_VALUE_FACTOR
+print("This Oyster's APM is: " + str(apm) + "CM" + " Or: "+ str(test_max[3])+ " pixels")
 #DVM
 for_dvm = np.array(final).transpose()
 for_dvm[test_max_2[0]][test_max_2[1]:test_max_2[2]] = 1
+
+dvm = test_max_2[3]*PIXEL_VALUE_TO_ACTUAL_VALUE_FACTOR
+print("This Oyster's DVM is: " + str(dvm) + "CM" + " Or: "+ str(test_max_2[3])+ " pixels")
+
 actual_final = np.array(for_dvm).transpose().tolist()
 plt.imshow(actual_final)
 
