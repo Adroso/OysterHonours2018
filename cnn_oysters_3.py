@@ -255,15 +255,15 @@ print("minors: ", minor_distance_count)
 filteres_2_transposed = np.array(filtered_results_2).transpose().tolist() #untransposing to make it look good again.
 
 #comabine horizontal and vertical
-for position_main, pixel_main in enumerate(filtered_result):
-    for position_idv_pix, pixel_idv_pix in enumerate(pixel_main):
-        if pixel_idv_pix == 0:
-            if filteres_2_transposed[position_main][position_idv_pix] == 1:
-                pixel_main[position_idv_pix] = 1
-            elif filteres_2_transposed[position_main][position_idv_pix] == 0.7:
-                pixel_main[position_idv_pix] = 0.7
-        elif filteres_2_transposed[position_main][position_idv_pix] == 0.7:
-            pixel_main[position_idv_pix]= 0.7
+# for position_main, pixel_main in enumerate(filtered_result):
+#     for position_idv_pix, pixel_idv_pix in enumerate(pixel_main):
+#         if pixel_idv_pix == 0:
+#             if filteres_2_transposed[position_main][position_idv_pix] == 1:
+#                 pixel_main[position_idv_pix] = 1
+#             elif filteres_2_transposed[position_main][position_idv_pix] == 0.7:
+#                 pixel_main[position_idv_pix] = 0.7
+#         elif filteres_2_transposed[position_main][position_idv_pix] == 0.7:
+#             pixel_main[position_idv_pix]= 0.7
 
 """END OF PIXEL COUNTING ALGORITHIM SECTION"""
 

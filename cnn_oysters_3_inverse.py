@@ -42,7 +42,7 @@ NUMBER_OF_OYSTERS_WIDE = 2
 
 """PRE-PROCESSING SECTION"""
 #Reading Image
-raw_image = cv2.imread('OysterImages/CustomFinal/GOPR0005.JPG')
+raw_image = cv2.imread('OysterImages/CustomFinal/GOPR0005_hc.jpg')
 grey_image = cv2.cvtColor(raw_image, cv2.COLOR_BGR2GRAY)
 height, width = grey_image.shape[0], grey_image.shape[1]
 
@@ -85,7 +85,7 @@ while roi_counter < NUMBER_OF_OYSTERS_HIGH:
 
 
 #show an image
-plt.imshow(separated_oyster_images['2A'])
+plt.imshow(separated_oyster_images['0B'])
 plt.show()
 tf.reset_default_graph()
 
@@ -94,7 +94,7 @@ tf.reset_default_graph()
 """FOR THE PURPOSE OF RUNNING WHILE TESTING
 SPECIFYING 1 OYSTER HERE"""
 
-image = separated_oyster_images['2A']
+image = separated_oyster_images['0B']
 
 """CNN EDGE DETECTION SECTION"""
 # Write the kernel weights as a 2D array.
@@ -174,12 +174,6 @@ filtered_results_2 = np.array(filtered_result).transpose().tolist()
 """PIXEL COUNTING ALGORITHIM SECTION"""
 major_distance_count = 0
 minor_distance_count = 0
-
-def list_check_remaining(list_to_check, threshold):
-    for x in list_to_check:
-        if x > threshold:
-            return False
-        return True
 
 plt.imshow(filtered_result)
 plt.show()
