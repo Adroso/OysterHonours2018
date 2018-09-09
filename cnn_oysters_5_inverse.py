@@ -85,7 +85,7 @@ while roi_counter < NUMBER_OF_OYSTERS_HIGH:
 
 
 
-oyster_in_question = '0A'
+oyster_in_question = '5B'
 #show an image
 plt.imshow(separated_oyster_images[oyster_in_question])
 plt.show()
@@ -100,10 +100,10 @@ image = separated_oyster_images[oyster_in_question]
 
 """CNN EDGE DETECTION SECTION"""
 # Write the kernel weights as a 2D array.
-kernel_h = np.array([3, 3])
-kernel_h = [ [-1,-2,-1], [0,0,0], [1,2,1] ]
-kernel_v = np.array([3, 3])
-kernel_v = [ [-1,0,1], [-2,0,2], [-1,0,1] ]
+kernel_h = np.array([5, 5])
+kernel_h = [[-2,-2,-2,-2,-2],[-1,-1,-1,-1,-1],[0,0,0,0,0],[1,1,1,1,1],[2,2,2,2,2]]
+kernel_v = np.array([5, 5])
+kernel_v = [[-2,-1,0,1,2],[-2,-1,0,1,2],[-2,-1,0,1,2],[-2,-1,0,1,2],[-2,-1,0,1,2]]
 
 
 # Kernel weights
@@ -113,8 +113,8 @@ if len(kernel_h) == 0 or len(kernel_v) == 0:
 input_placeholder = tf.placeholder(
     dtype=tf.float32, shape=(1, image.shape[0], image.shape[1], 1))
 with tf.name_scope('convolution'):
-    conv_w_h = tf.constant(kernel_h, dtype=tf.float32, shape=(3, 3, 1, 1))
-    conv_w_v = tf.constant(kernel_v, dtype=tf.float32, shape=(3, 3, 1, 1))
+    conv_w_h = tf.constant(kernel_h, dtype=tf.float32, shape=(5, 5, 1, 1))
+    conv_w_v = tf.constant(kernel_v, dtype=tf.float32, shape=(5, 5, 1, 1))
     output_h = tf.nn.conv2d(input=input_placeholder, filter=conv_w_h, strides=[1, 1, 1, 1], padding='SAME')
     output_v = tf.nn.conv2d(input=input_placeholder, filter=conv_w_v, strides=[1, 1, 1, 1], padding='SAME')
     output_h = tf.layers.max_pooling2d(output_h, 2, 2)
