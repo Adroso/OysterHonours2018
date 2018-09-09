@@ -85,7 +85,7 @@ while roi_counter < NUMBER_OF_OYSTERS_HIGH:
 
 
 
-oyster_in_question = '0B'
+oyster_in_question = '5B'
 #show an image
 plt.imshow(separated_oyster_images[oyster_in_question])
 plt.show()
