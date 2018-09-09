@@ -31,7 +31,7 @@ apperture = 2.97
 #For Cropping
 left_crop = 920
 right_crop = 1600
-top_crop = 60
+top_crop = 150
 bottom_crop = 2800
 NUMBER_OF_OYSTERS_HIGH = 8
 NUMBER_OF_OYSTERS_WIDE = 2
@@ -56,7 +56,9 @@ mod.initialize(focal_length, apperture, 1)
 undist_coords = mod.apply_geometry_distortion()
 grey_image_undistorted = cv2.remap(grey_image, undist_coords, None, cv2.INTER_LANCZOS4)
 
+
 #Blur
+grey_image_undistorted = cv2.GaussianBlur(grey_image_undistorted,(5,5), 1)
 grey_image_undistorted = cv2.GaussianBlur(grey_image_undistorted,(5,5), 1)
 
 #Rotation Correction
@@ -87,7 +89,9 @@ while roi_counter < NUMBER_OF_OYSTERS_HIGH:
 
 
 #show an image
-plt.imshow(separated_oyster_images['0B'])
+
+oyster_in_question = '1a'.upper()
+plt.imshow(separated_oyster_images[oyster_in_question])
 plt.show()
 tf.reset_default_graph()
 
@@ -96,7 +100,7 @@ tf.reset_default_graph()
 """FOR THE PURPOSE OF RUNNING WHILE TESTING
 SPECIFYING 1 OYSTER HERE"""
 
-image = separated_oyster_images['0B']
+image = separated_oyster_images[oyster_in_question]
 
 """CNN EDGE DETECTION SECTION"""
 # Write the kernel weights as a 2D array.
@@ -159,7 +163,7 @@ for vertical_pixel_array in result_rgb: #note the array has 3 wide values, rgb c
     inner_list = []
     for vertical_pixel in vertical_pixel_array:
         new_pixel_value = np.mean(vertical_pixel) #might change this way of converting rgb into a single channel
-        if new_pixel_value < 0.079:
+        if new_pixel_value < 0.05:
             new_pixel_value = 0
         else:
             new_pixel_value =1
