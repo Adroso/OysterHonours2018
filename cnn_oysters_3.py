@@ -42,7 +42,7 @@ NUMBER_OF_OYSTERS_WIDE = 2
 
 """PRE-PROCESSING SECTION"""
 #Reading Image
-raw_image = cv2.imread('OysterImages/1 (22).JPG')
+raw_image = cv2.imread('OysterImages/1 (21).JPG')
 grey_image = cv2.cvtColor(raw_image, cv2.COLOR_BGR2GRAY)
 height, width = grey_image.shape[0], grey_image.shape[1]
 
@@ -87,7 +87,7 @@ while roi_counter < NUMBER_OF_OYSTERS_HIGH:
 
 
 #show an image
-plt.imshow(separated_oyster_images['6B'])
+plt.imshow(separated_oyster_images['0A'])
 plt.show()
 tf.reset_default_graph()
 
@@ -96,7 +96,7 @@ tf.reset_default_graph()
 """FOR THE PURPOSE OF RUNNING WHILE TESTING
 SPECIFYING 1 OYSTER HERE"""
 
-image = separated_oyster_images['6B']
+image = separated_oyster_images['0A']
 
 """CNN EDGE DETECTION SECTION"""
 # Write the kernel weights as a 2D array.
@@ -168,7 +168,8 @@ for vertical_pixel_array in result_rgb: #note the array has 3 wide values, rgb c
     filtered_result.append(inner_list)
     horizontal_pixel_id +=1
 filtered_results_2 = np.array(filtered_result).transpose().tolist()
-#plt.imshow(filtered_result)
+plt.imshow(filtered_result)
+plt.show()
 """END OF FILTERING EDGES SECTION"""
 
 

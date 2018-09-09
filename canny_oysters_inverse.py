@@ -12,10 +12,10 @@ import lensfunpy
 #Setting all globals and constants
 
 #THE MAIN ONE
-PIXEL_VALUE_TO_ACTUAL_VALUE_FACTOR = 0.08
+PIXEL_VALUE_TO_ACTUAL_VALUE_FACTOR = 0.04
 
 #For pixel counting Algorithim
-PIXEL_TO_LOOK = 1
+PIXEL_TO_LOOK = 255
 INVERSE_PIXEL_TO_LOOK = 0
 DISTANCE_THRESHOLD = 40
 PIXEL_IGNORE_THRESHOLD = 30
@@ -42,7 +42,7 @@ NUMBER_OF_OYSTERS_WIDE = 2
 
 """PRE-PROCESSING SECTION"""
 #Reading Image
-raw_image = cv2.imread('OysterImages/CustomFinal/GOPR0005.jpg')
+raw_image = cv2.imread('OysterImages/CustomFinal/GOPR0005.JPG')
 grey_image = cv2.cvtColor(raw_image, cv2.COLOR_BGR2GRAY)
 height, width = grey_image.shape[0], grey_image.shape[1]
 
@@ -85,7 +85,7 @@ while roi_counter < NUMBER_OF_OYSTERS_HIGH:
 
 
 
-oyster_in_question = '5B'
+oyster_in_question = '0a'.upper()
 #show an image
 plt.imshow(separated_oyster_images[oyster_in_question])
 plt.show()
@@ -98,75 +98,10 @@ SPECIFYING 1 OYSTER HERE"""
 
 image = separated_oyster_images[oyster_in_question]
 
-"""CNN EDGE DETECTION SECTION"""
+"""CANNY EDGE DETECTION SECTION"""
 # Write the kernel weights as a 2D array.
-kernel_h = np.array([5, 5])
-kernel_h = [[-2,-2,-2,-2,-2],[-1,-1,-1,-1,-1],[0,0,0,0,0],[1,1,1,1,1],[2,2,2,2,2]]
-kernel_v = np.array([5, 5])
-kernel_v = [[-2,-1,0,1,2],[-2,-1,0,1,2],[-2,-1,0,1,2],[-2,-1,0,1,2],[-2,-1,0,1,2]]
-
-
-# Kernel weights
-if len(kernel_h) == 0 or len(kernel_v) == 0:
-    print('Please specify the kernel!')
-
-input_placeholder = tf.placeholder(
-    dtype=tf.float32, shape=(1, image.shape[0], image.shape[1], 1))
-with tf.name_scope('convolution'):
-    conv_w_h = tf.constant(kernel_h, dtype=tf.float32, shape=(5, 5, 1, 1))
-    conv_w_v = tf.constant(kernel_v, dtype=tf.float32, shape=(5, 5, 1, 1))
-    output_h = tf.nn.conv2d(input=input_placeholder, filter=conv_w_h, strides=[1, 1, 1, 1], padding='SAME')
-    output_v = tf.nn.conv2d(input=input_placeholder, filter=conv_w_v, strides=[1, 1, 1, 1], padding='SAME')
-    output_h = tf.layers.max_pooling2d(output_h, 2, 2)
-    output_v = tf.layers.max_pooling2d(output_v, 2, 2)
-
-
-with tf.Session() as sess:
-    result_h = sess.run(output_h, feed_dict={
-            input_placeholder: image[np.newaxis, :, :, np.newaxis]})
-    result_v = sess.run(output_v, feed_dict={
-            input_placeholder: image[np.newaxis, :, :, np.newaxis]})
-
-result_lenght = ((result_v**2) + (result_h**2))**0.5
-plt.imshow(result_lenght[0, :, :, 0], cmap='hot')
-
-result_angle = (np.arctan(result_v/(result_h+0.00000001)))#*(2*math.pi)
-plt.imshow(result_angle[0, :, :, 0], cmap='hot')
-
-
-result_lenght_norm = (result_lenght[0,:,:,0] + (np.min(result_lenght)*-1) ) / (np.min(result_lenght)*-1 + np.max(result_lenght))
-result_angle_norm = result_angle[0,:,:,0]
-result_red = np.absolute(result_lenght_norm * np.cos(result_angle_norm+4.2))
-result_green = np.absolute(result_lenght_norm * np.cos(result_angle_norm+2.1))
-result_blue = np.absolute(result_lenght_norm * np.cos(result_angle_norm))
-result_rgb = np.zeros((len(result_red),len(result_red[0]), 3))
-result_rgb[...,0] = (result_red + (np.min(result_red)*-1) ) / (np.min(result_red)*-1 + np.max(result_red))
-result_rgb[...,1] = (result_green + (np.min(result_green)*-1) ) / (np.min(result_green)*-1 + np.max(result_green))
-result_rgb[...,2] = (result_blue + (np.min(result_blue)*-1) ) / (np.min(result_blue)*-1 + np.max(result_blue))
-
-
-"""END OF CNN-EDGE DECTECTION SECTION"""
-
-"""FILTERING WEAK EDGES SECTION"""
-#filtering the list for stronger values
-horizontal_pixel_id = 0
-vertical_pixel_id = 0
-max_loop = 0 #425 as above
-filtered_result = []
-for vertical_pixel_array in result_rgb: #note the array has 3 wide values, rgb channels. these will need to be averaged then used
-    #print("Current Horizontal Pixel: ", horizontal_pixel_id)
-    #print(vertical_pixel_array)
-    inner_list = []
-    for vertical_pixel in vertical_pixel_array:
-        new_pixel_value = np.mean(vertical_pixel) #might change this way of converting rgb into a single channel
-        if new_pixel_value < 0.04: #lower is let more detail, higher reduces detail
-            new_pixel_value = 0
-        else:
-            new_pixel_value =1
-        inner_list.append(new_pixel_value)
-
-    filtered_result.append(inner_list)
-    horizontal_pixel_id +=1
+filtered_result = cv2.Canny(image,10,100)
+print(filtered_result)
 filtered_results_2 = np.array(filtered_result).transpose().tolist()
 # plt.imshow(filtered_result)
 # plt.show()
@@ -202,7 +137,7 @@ for po, hp in enumerate(filtered_result):
             if distance > DISTANCE_THRESHOLD:
                 hp[starting_edge:ending_edge + 1] = [1] * ((ending_edge + 1) - starting_edge)
                 major_distance_count +=1
-                if distance > hp_max[0] and loop_count < len(result_red) - PIXEL_IGNORE_THRESHOLD:
+                if distance > hp_max[0] and loop_count < filtered_result.shape[1] - PIXEL_IGNORE_THRESHOLD:
                     hp_max[0] = distance
                     hp[starting_edge:ending_edge + 1] = [0.7] * ((ending_edge + 1) - starting_edge)
                     #print("Current Max Distance APM: ", distance)
@@ -287,7 +222,7 @@ filteres_2_transposed = np.array(filtered_results_2).transpose().tolist() #untra
 print(test_max)
 print(test_max_2)
 #APM
-f_height, f_width = result_rgb.shape[0], result_rgb.shape[1]
+f_height, f_width = filtered_result.shape[0], filtered_result.shape[1]
 final = cv2.resize(image,(f_width, f_height))
 final[test_max[0]][test_max[1]:test_max[2]] = 1
 apm = test_max[3]*PIXEL_VALUE_TO_ACTUAL_VALUE_FACTOR

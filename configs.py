@@ -1,6 +1,6 @@
 #Kyalls
 #THE MAIN ONE
-PIXEL_VALUE_TO_ACTUAL_VALUE_FACTOR = 3
+PIXEL_VALUE_TO_ACTUAL_VALUE_FACTOR = 0.11
 
 #For pixel counting Algorithim
 PIXEL_TO_LOOK = 1
@@ -17,9 +17,9 @@ focal_length = 5
 apperture = 2.97
 
 #For Cropping
-left_crop = 860
+left_crop = 910
 right_crop = 1600
 top_crop = 50
-bottom_crop = 2900
+bottom_crop = 2800
 NUMBER_OF_OYSTERS_HIGH = 8
 NUMBER_OF_OYSTERS_WIDE = 2
