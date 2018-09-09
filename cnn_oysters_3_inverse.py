@@ -12,7 +12,7 @@ import lensfunpy
 #Setting all globals and constants
 
 #THE MAIN ONE
-PIXEL_VALUE_TO_ACTUAL_VALUE_FACTOR = 0.1
+PIXEL_VALUE_TO_ACTUAL_VALUE_FACTOR = 0.0799
 
 #For pixel counting Algorithim
 PIXEL_TO_LOOK = 1
@@ -85,7 +85,7 @@ while roi_counter < NUMBER_OF_OYSTERS_HIGH:
 
 
 #show an image
-plt.imshow(separated_oyster_images['0B'])
+plt.imshow(separated_oyster_images['0A'])
 plt.show()
 tf.reset_default_graph()
 
@@ -94,7 +94,7 @@ tf.reset_default_graph()
 """FOR THE PURPOSE OF RUNNING WHILE TESTING
 SPECIFYING 1 OYSTER HERE"""
 
-image = separated_oyster_images['0B']
+image = separated_oyster_images['0A']
 
 """CNN EDGE DETECTION SECTION"""
 # Write the kernel weights as a 2D array.
@@ -288,17 +288,21 @@ print(test_max_2)
 f_height, f_width = result_rgb.shape[0], result_rgb.shape[1]
 final = cv2.resize(image,(f_width, f_height))
 final[test_max[0]][test_max[1]:test_max[2]] = 1
-
 apm = test_max[3]*PIXEL_VALUE_TO_ACTUAL_VALUE_FACTOR
-print("This Oyster's APM is: " + str(apm) + "CM" + " Or: "+ str(test_max[3])+ " pixels")
+
 #DVM
 for_dvm = np.array(final).transpose()
 for_dvm[test_max_2[0]][test_max_2[1]:test_max_2[2]] = 1
-
 dvm = test_max_2[3]*PIXEL_VALUE_TO_ACTUAL_VALUE_FACTOR
-print("This Oyster's DVM is: " + str(dvm) + "CM" + " Or: "+ str(test_max_2[3])+ " pixels")
 
+
+
+
+print("This Oyster's DVM is: " + str(dvm) + "CM" + " Or: "+ str(test_max_2[3])+ " pixels")
+print("This Oyster's APM is: " + str(apm) + "CM" + " Or: "+ str(test_max[3])+ " pixels")
 actual_final = np.array(for_dvm).transpose().tolist()
+
+
 plt.imshow(actual_final)
 
 # printing out results
