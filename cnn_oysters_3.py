@@ -29,9 +29,9 @@ focal_length = 5
 apperture = 2.97
 
 #For Cropping
-left_crop = 910
+left_crop = 920
 right_crop = 1600
-top_crop = 50
+top_crop = 60
 bottom_crop = 2800
 NUMBER_OF_OYSTERS_HIGH = 8
 NUMBER_OF_OYSTERS_WIDE = 2
@@ -42,7 +42,7 @@ NUMBER_OF_OYSTERS_WIDE = 2
 
 """PRE-PROCESSING SECTION"""
 #Reading Image
-raw_image = cv2.imread('OysterImages/1 (21).JPG')
+raw_image = cv2.imread('OysterImages/1 (27).JPG')
 grey_image = cv2.cvtColor(raw_image, cv2.COLOR_BGR2GRAY)
 height, width = grey_image.shape[0], grey_image.shape[1]
 
@@ -87,7 +87,7 @@ while roi_counter < NUMBER_OF_OYSTERS_HIGH:
 
 
 #show an image
-plt.imshow(separated_oyster_images['0A'])
+plt.imshow(separated_oyster_images['0B'])
 plt.show()
 tf.reset_default_graph()
 
@@ -96,7 +96,7 @@ tf.reset_default_graph()
 """FOR THE PURPOSE OF RUNNING WHILE TESTING
 SPECIFYING 1 OYSTER HERE"""
 
-image = separated_oyster_images['0A']
+image = separated_oyster_images['0B']
 
 """CNN EDGE DETECTION SECTION"""
 # Write the kernel weights as a 2D array.

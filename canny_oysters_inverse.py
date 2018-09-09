@@ -12,7 +12,7 @@ import lensfunpy
 #Setting all globals and constants
 
 #THE MAIN ONE
-PIXEL_VALUE_TO_ACTUAL_VALUE_FACTOR = 0.04
+PIXEL_VALUE_TO_ACTUAL_VALUE_FACTOR = 0.039
 
 #For pixel counting Algorithim
 PIXEL_TO_LOOK = 255
@@ -85,7 +85,7 @@ while roi_counter < NUMBER_OF_OYSTERS_HIGH:
 
 
 
-oyster_in_question = '0a'.upper()
+oyster_in_question = '5b'.upper()
 #show an image
 plt.imshow(separated_oyster_images[oyster_in_question])
 plt.show()

@@ -12,7 +12,7 @@ import lensfunpy
 #Setting all globals and constants
 
 #THE MAIN ONE
-PIXEL_VALUE_TO_ACTUAL_VALUE_FACTOR = 0.08
+PIXEL_VALUE_TO_ACTUAL_VALUE_FACTOR = 0.076
 
 #For pixel counting Algorithim
 PIXEL_TO_LOOK = 1
@@ -42,7 +42,7 @@ NUMBER_OF_OYSTERS_WIDE = 2
 
 """PRE-PROCESSING SECTION"""
 #Reading Image
-raw_image = cv2.imread('OysterImages/CustomFinal/GOPR0005_net_2.jpg')
+raw_image = cv2.imread('OysterImages/CustomFinal/GOPR0005.JPG')
 grey_image = cv2.cvtColor(raw_image, cv2.COLOR_BGR2GRAY)
 height, width = grey_image.shape[0], grey_image.shape[1]
 
@@ -85,7 +85,7 @@ while roi_counter < NUMBER_OF_OYSTERS_HIGH:
 
 
 
-oyster_in_question = '0A'
+oyster_in_question = '5B'
 #show an image
 plt.imshow(separated_oyster_images[oyster_in_question])
 plt.show()

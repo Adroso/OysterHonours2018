@@ -12,7 +12,7 @@ import lensfunpy
 #Setting all globals and constants
 
 #THE MAIN ONE
-PIXEL_VALUE_TO_ACTUAL_VALUE_FACTOR = 0.08
+PIXEL_VALUE_TO_ACTUAL_VALUE_FACTOR = 0.076
 
 #For pixel counting Algorithim
 PIXEL_TO_LOOK = 1
