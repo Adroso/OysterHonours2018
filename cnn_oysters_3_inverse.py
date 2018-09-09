@@ -186,7 +186,6 @@ for po, hp in enumerate(filtered_result):
     starting_edge = -1
     ending_edge = -1
     live_position = -1
-    inner_oyster = []
 
     for position, pixel_value in enumerate(hp[:-1]):
         if pixel_value == PIXEL_TO_LOOK and starting_edge == -1 and position not in [0,1,2,3,4]:
@@ -234,13 +233,14 @@ for vp_po, vp in enumerate(filtered_results_2):
     live_position_vp = -1
 
     for position, pixel_value in enumerate(vp[:-1]):
-        if pixel_value == PIXEL_TO_LOOK and starting_edge == -1 and position not in [-1,0,1,2,3,4]:
+        if pixel_value == PIXEL_TO_LOOK and starting_edge == -1 and position not in [0,1,2,3,4]:
             starting_edge = position
+
         elif pixel_value == PIXEL_TO_LOOK and starting_edge != -1:
             live_position_vp = position
 
         elif position == len(vp[:-1]) - 1:
-            ending_edge = position
+            ending_edge = live_position_vp
             distance = ending_edge - starting_edge
             if distance > DISTANCE_THRESHOLD:
                 if distance > vp_max[0]:
