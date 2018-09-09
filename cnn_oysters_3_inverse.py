@@ -12,7 +12,7 @@ import lensfunpy
 #Setting all globals and constants
 
 #THE MAIN ONE
-PIXEL_VALUE_TO_ACTUAL_VALUE_FACTOR = 0.0799
+PIXEL_VALUE_TO_ACTUAL_VALUE_FACTOR = 0.08
 
 #For pixel counting Algorithim
 PIXEL_TO_LOOK = 1
@@ -84,8 +84,10 @@ while roi_counter < NUMBER_OF_OYSTERS_HIGH:
     roi_counter+=1
 
 
+
+oyster_in_question = '0B'
 #show an image
-plt.imshow(separated_oyster_images['0A'])
+plt.imshow(separated_oyster_images[oyster_in_question])
 plt.show()
 tf.reset_default_graph()
 
@@ -94,7 +96,7 @@ tf.reset_default_graph()
 """FOR THE PURPOSE OF RUNNING WHILE TESTING
 SPECIFYING 1 OYSTER HERE"""
 
-image = separated_oyster_images['0A']
+image = separated_oyster_images[oyster_in_question]
 
 """CNN EDGE DETECTION SECTION"""
 # Write the kernel weights as a 2D array.
