@@ -1,13 +1,12 @@
-import skimage.io as ski
-import skimage.filters as filter
-import skimage.exposure as exposure
 import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
-import math
 import cv2
 import pandas
 import lensfunpy
+import csv
+from os import listdir
+import time
 """
 Created in 2018 by Adrian Lapico for completion of a Bachelors of Information Technology Honours. 
 (Github Adroso, Adrian Lapico)
@@ -20,7 +19,7 @@ This is a multi purpose oyster sizer, using only images of pearl images.
 PIXEL_VALUE_TO_ACTUAL_VALUE_FACTOR = 0.11
 
 #For pixel counting Algorithim
-PIXEL_TO_LOOK = 255
+PIXEL_TO_LOOK = 1
 INVERSE_PIXEL_TO_LOOK = 0
 DISTANCE_THRESHOLD = 40
 PIXEL_IGNORE_THRESHOLD = 30
@@ -337,21 +336,27 @@ END OF FINAL RESULTS SECTION
 """
 
 if __name__ == "__main__":
-    image_path = 'OysterImages/1 (20).JPG'
-    image = read_image(image_path)
-    image = rotation_correction(image)
-    image = lens_correction(image)
-    image = blur_image(image)
+    directory = 'OysterImages/testing'
+    images = listdir(directory)
+    results_file_name = "3x3.csv"
+    results_file = open(results_file_name, 'wb')
+    for image in images:
+        image_path = directory+"/"+image
+        image = read_image(image_path)
+        image = rotation_correction(image)
+        image = lens_correction(image)
+        image = blur_image(image)
 
-    cropped_image = region_of_interest_1(image)
-    separated_oysters = region_of_interest_2(cropped_image)
+        cropped_image = region_of_interest_1(image)
+        separated_oysters = region_of_interest_2(cropped_image)
 
-    for key, oyster in separated_oysters.items():
-        #filtered_result, filtered_result_2 = canny(oyster)
+        for key, oyster in separated_oysters.items():
+            #filtered_result, filtered_result_2 = canny(oyster)
 
-        edges = cnn_3x3(oyster)
-        filtered_result, filtered_result_2 = filtering_cnn(edges)
+            edges = cnn_3x3(oyster)
+            filtered_result, filtered_result_2 = filtering_cnn(edges)
 
-        test_max = pixel_counter_net_images(filtered_result)
-        test_max_2 = pixel_counter_net_images(filtered_result)
-        results = convert_pixels_to_measurements(edges, oyster, test_max, test_max_2)
+            test_max = pixel_counter_net_images(filtered_result)
+            test_max_2 = pixel_counter_net_images(filtered_result_2)
+            results = convert_pixels_to_measurements(edges, oyster, test_max, test_max_2)
+    results_file.close()
