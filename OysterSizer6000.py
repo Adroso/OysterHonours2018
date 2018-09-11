@@ -335,7 +335,12 @@ def convert_pixels_to_measurements(filtered_result, image, test_max, test_max_2)
 END OF FINAL RESULTS SECTION
 """
 
-
 if __name__ == "__main__":
-    image_path = 'OysterImages/devided/1.jpg'
-    pass
+    image_path = 'OysterImages/1 (20).JPG'
+    image = read_image(image_path)
+    image = lens_correction(image)
+    image = rotation_correction(image)
+    image = blur_image(image)
+
+    image = region_of_interest_1(image)
+    separated_oysters = region_of_interest_2(image)
