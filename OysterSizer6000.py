@@ -20,7 +20,7 @@ This is a multi purpose oyster sizer, using only images of pearl images.
 PIXEL_VALUE_TO_ACTUAL_VALUE_FACTOR = 0.11
 
 #For pixel counting Algorithim
-PIXEL_TO_LOOK = 1
+PIXEL_TO_LOOK = 255
 INVERSE_PIXEL_TO_LOOK = 0
 DISTANCE_THRESHOLD = 40
 PIXEL_IGNORE_THRESHOLD = 30
@@ -79,7 +79,7 @@ def region_of_interest_1(image):
     # [top:bottom, left:right]
     plt.imshow(full_pre_processed_image)
     plt.show()
-    return image
+    return full_pre_processed_image
 
 def region_of_interest_2(image):
     """Returns a Dictionary of all oysters cropped in the image"""
@@ -131,10 +131,10 @@ def cnn_3x3(image):
             input_placeholder: image[np.newaxis, :, :, np.newaxis]})
 
     result_lenght = ((result_v ** 2) + (result_h ** 2)) ** 0.5
-    plt.imshow(result_lenght[0, :, :, 0], cmap='hot')
+    #plt.imshow(result_lenght[0, :, :, 0], cmap='hot')
 
     result_angle = (np.arctan(result_v / (result_h + 0.00000001)))  # *(2*math.pi)
-    plt.imshow(result_angle[0, :, :, 0], cmap='hot')
+    #plt.imshow(result_angle[0, :, :, 0], cmap='hot')
 
     result_lenght_norm = (result_lenght[0, :, :, 0] + (np.min(result_lenght) * -1)) / (
                 np.min(result_lenght) * -1 + np.max(result_lenght))
@@ -178,10 +178,10 @@ def cnn_5x5(image):
             input_placeholder: image[np.newaxis, :, :, np.newaxis]})
 
     result_lenght = ((result_v ** 2) + (result_h ** 2)) ** 0.5
-    plt.imshow(result_lenght[0, :, :, 0], cmap='hot')
+    #plt.imshow(result_lenght[0, :, :, 0], cmap='hot')
 
     result_angle = (np.arctan(result_v / (result_h + 0.00000001)))  # *(2*math.pi)
-    plt.imshow(result_angle[0, :, :, 0], cmap='hot')
+    #plt.imshow(result_angle[0, :, :, 0], cmap='hot')
 
     result_lenght_norm = (result_lenght[0, :, :, 0] + (np.min(result_lenght) * -1)) / (
                 np.min(result_lenght) * -1 + np.max(result_lenght))
@@ -266,8 +266,8 @@ def pixel_counter_inverse_images(filtered_result):
     major_distance_count = 0
     minor_distance_count = 0
 
-    plt.imshow(filtered_result)
-    plt.show()
+    # plt.imshow(filtered_result)
+    # plt.show()
 
     # coutning horizontal distances
     hp_max = [0]  # [distance, outerlistposition, start_innerlist, end_innerlist]
@@ -331,6 +331,7 @@ def convert_pixels_to_measurements(filtered_result, image, test_max, test_max_2)
     actual_final = np.array(for_dvm).transpose().tolist()
 
     plt.imshow(actual_final)
+    plt.show()
 """
 END OF FINAL RESULTS SECTION
 """
@@ -338,9 +339,19 @@ END OF FINAL RESULTS SECTION
 if __name__ == "__main__":
     image_path = 'OysterImages/1 (20).JPG'
     image = read_image(image_path)
-    image = lens_correction(image)
     image = rotation_correction(image)
+    image = lens_correction(image)
     image = blur_image(image)
 
-    image = region_of_interest_1(image)
-    separated_oysters = region_of_interest_2(image)
+    cropped_image = region_of_interest_1(image)
+    separated_oysters = region_of_interest_2(cropped_image)
+
+    for key, oyster in separated_oysters.items():
+        #filtered_result, filtered_result_2 = canny(oyster)
+
+        edges = cnn_3x3(oyster)
+        filtered_result, filtered_result_2 = filtering_cnn(edges)
+
+        test_max = pixel_counter_net_images(filtered_result)
+        test_max_2 = pixel_counter_net_images(filtered_result)
+        results = convert_pixels_to_measurements(edges, oyster, test_max, test_max_2)
