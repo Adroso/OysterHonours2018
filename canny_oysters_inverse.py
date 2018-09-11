@@ -85,7 +85,7 @@ while roi_counter < NUMBER_OF_OYSTERS_HIGH:
 
 
 
-oyster_in_question = '5b'.upper()
+oyster_in_question = '0b'.upper()
 #show an image
 plt.imshow(separated_oyster_images[oyster_in_question])
 plt.show()
@@ -153,10 +153,6 @@ for po, hp in enumerate(filtered_result):
             hp[position] = 0
 
     loop_count +=1
-
-
-# plt.imshow(filtered_result)
-# plt.show()
 
 
 #counting vertical distances

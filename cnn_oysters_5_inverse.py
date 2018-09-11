@@ -149,9 +149,6 @@ result_rgb[...,2] = (result_blue + (np.min(result_blue)*-1) ) / (np.min(result_b
 
 """FILTERING WEAK EDGES SECTION"""
 #filtering the list for stronger values
-horizontal_pixel_id = 0
-vertical_pixel_id = 0
-max_loop = 0 #425 as above
 filtered_result = []
 for vertical_pixel_array in result_rgb: #note the array has 3 wide values, rgb channels. these will need to be averaged then used
     #print("Current Horizontal Pixel: ", horizontal_pixel_id)
@@ -164,9 +161,7 @@ for vertical_pixel_array in result_rgb: #note the array has 3 wide values, rgb c
         else:
             new_pixel_value =1
         inner_list.append(new_pixel_value)
-
     filtered_result.append(inner_list)
-    horizontal_pixel_id +=1
 filtered_results_2 = np.array(filtered_result).transpose().tolist()
 # plt.imshow(filtered_result)
 # plt.show()
