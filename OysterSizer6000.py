@@ -76,8 +76,8 @@ def rotation_correction(image_to_rotate):
 def region_of_interest_1(image):
     full_pre_processed_image = image[top_crop:bottom_crop, left_crop:right_crop]  # crop
     # [top:bottom, left:right]
-    plt.imshow(full_pre_processed_image)
-    plt.show()
+    # plt.imshow(full_pre_processed_image)
+    # plt.show()
     return full_pre_processed_image
 
 def region_of_interest_2(image):
@@ -314,9 +314,11 @@ END OF PIXEL COUNTING ALGORITHIMS SECTION
 FINAL RESULTS SECTION
 """
 def convert_pixels_to_measurements(filtered_result, image, test_max, test_max_2):
+
     # APM
     f_height, f_width = filtered_result.shape[0], filtered_result.shape[1]
     final = cv2.resize(image, (f_width, f_height))
+
     final[test_max[0]][test_max[1]:test_max[2]] = 1
     apm = test_max[3] * PIXEL_VALUE_TO_ACTUAL_VALUE_FACTOR
 
@@ -324,24 +326,28 @@ def convert_pixels_to_measurements(filtered_result, image, test_max, test_max_2)
     for_dvm = np.array(final).transpose()
     for_dvm[test_max_2[0]][test_max_2[1]:test_max_2[2]] = 1
     dvm = test_max_2[3] * PIXEL_VALUE_TO_ACTUAL_VALUE_FACTOR
-
-    print("This Oyster's DVM is: " + str(dvm) + "CM" + " Or: " + str(test_max_2[3]) + " pixels")
-    print("This Oyster's APM is: " + str(apm) + "CM" + " Or: " + str(test_max[3]) + " pixels")
+    #print("This Oyster's DVM is: " + str(dvm) + "CM" + " Or: " + str(test_max_2[3]) + " pixels")
+    #print("This Oyster's APM is: " + str(apm) + "CM" + " Or: " + str(test_max[3]) + " pixels")
     actual_final = np.array(for_dvm).transpose().tolist()
 
-    plt.imshow(actual_final)
-    plt.show()
+    # plt.imshow(actual_final)
+    # plt.show()
+
+    return test_max_2[3], test_max[3], dvm, apm
 """
 END OF FINAL RESULTS SECTION
 """
 
 if __name__ == "__main__":
-    directory = 'OysterImages/testing'
+    directory = 'F:\Honours Image Library\Oysters\ALL_IMAGES'
     images = listdir(directory)
-    results_file_name = "3x3.csv"
-    results_file = open(results_file_name, 'wb')
-    for image in images:
-        image_path = directory+"/"+image
+
+    overal_start_time = time.time()
+    oyster_results =[]
+
+    for image_name in images:
+        oyster_process_start = time.time()
+        image_path = directory+"/"+image_name
         image = read_image(image_path)
         image = rotation_correction(image)
         image = lens_correction(image)
@@ -358,5 +364,19 @@ if __name__ == "__main__":
 
             test_max = pixel_counter_net_images(filtered_result)
             test_max_2 = pixel_counter_net_images(filtered_result_2)
-            results = convert_pixels_to_measurements(edges, oyster, test_max, test_max_2)
+            dvm_pixels, apm_pixels, dvm, apm = convert_pixels_to_measurements(edges, oyster, test_max, test_max_2)
+
+            oyster_id = image_name[:-4]+"_"+key
+            process_time = time.time() - oyster_process_start
+
+            oyster_results.append([oyster_id, dvm_pixels, apm_pixels, dvm, apm, process_time])
+    overal_end_time = time.time() - overal_start_time
+
+
+
+    results_file_name = "3x3.csv"
+    results_file = open(results_file_name, 'w', newline='')
+    writer = csv.writer(results_file)
+    writer.writerows(oyster_results)
     results_file.close()
+    print(overal_end_time)
