@@ -33,7 +33,7 @@ focal_length = 5
 apperture = 2.97
 
 #For Cropping
-left_crop = 920
+left_crop = 780
 right_crop = 1600
 top_crop = 150
 bottom_crop = 2800
@@ -339,7 +339,7 @@ END OF FINAL RESULTS SECTION
 """
 
 if __name__ == "__main__":
-    directory = 'F:\Honours Image Library\Oysters\ALL_IMAGES'
+    directory = 'F:\Honours Image Library\Oysters\Test'
     images = listdir(directory)
 
     overal_start_time = time.time()
@@ -355,16 +355,18 @@ if __name__ == "__main__":
 
         cropped_image = region_of_interest_1(image)
         separated_oysters = region_of_interest_2(cropped_image)
-
+        plt.imshow(cropped_image)
+        plt.show()
+        break
         for key, oyster in separated_oysters.items():
-            #filtered_result, filtered_result_2 = canny(oyster)
+            filtered_result, filtered_result_2 = canny(oyster)
 
-            edges = cnn_3x3(oyster)
-            filtered_result, filtered_result_2 = filtering_cnn(edges)
+            #edges = cnn_5x5(oyster)
+            #filtered_result, filtered_result_2 = filtering_cnn(edges)
 
             test_max = pixel_counter_net_images(filtered_result)
             test_max_2 = pixel_counter_net_images(filtered_result_2)
-            dvm_pixels, apm_pixels, dvm, apm = convert_pixels_to_measurements(edges, oyster, test_max, test_max_2)
+            dvm_pixels, apm_pixels, dvm, apm = convert_pixels_to_measurements(filtered_result, oyster, test_max, test_max_2)
 
             oyster_id = image_name[:-4]+"_"+key
             process_time = time.time() - oyster_process_start
@@ -374,7 +376,7 @@ if __name__ == "__main__":
 
 
 
-    results_file_name = "3x3.csv"
+    results_file_name = "canny.csv"
     results_file = open(results_file_name, 'w', newline='')
     writer = csv.writer(results_file)
     writer.writerows(oyster_results)
