@@ -1,6 +1,7 @@
 import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
+import matplotlib.image as plt_im
 import cv2
 import pandas
 import lensfunpy
@@ -15,11 +16,11 @@ This is a multi purpose oyster sizer, using only images of pearl images.
 
 """
 
-#Setting all globals and constants
-PIXEL_VALUE_TO_ACTUAL_VALUE_FACTOR = 0.11
+#THE MAIN ONE
+PIXEL_VALUE_TO_ACTUAL_VALUE_FACTOR = 0.039
 
 #For pixel counting Algorithim
-PIXEL_TO_LOOK = 1
+PIXEL_TO_LOOK = 255 #set to 255 for canny or 1 for CNN
 INVERSE_PIXEL_TO_LOOK = 0
 DISTANCE_THRESHOLD = 40
 PIXEL_IGNORE_THRESHOLD = 30
@@ -29,15 +30,15 @@ cam_maker = 'GoPro'
 cam_model = 'HERO4 Silver'
 lens_maker = 'GoPro'
 lens_model = 'HERO4'
-focal_length = 5
+focal_length = 3
 apperture = 2.97
 
 #For Cropping
-left_crop = 780
-right_crop = 1600
-top_crop = 150
-bottom_crop = 2800
-NUMBER_OF_OYSTERS_HIGH = 8
+left_crop = 1750
+right_crop = 2500
+top_crop = 400
+bottom_crop = 2900
+NUMBER_OF_OYSTERS_HIGH = 6
 NUMBER_OF_OYSTERS_WIDE = 2
 # Note built for a max of 2 wide, if this needs to be changed for more than 2 code in the ROI section deeds to be edited
 
@@ -290,7 +291,7 @@ def pixel_counter_inverse_images(filtered_result):
                 if distance > DISTANCE_THRESHOLD:
                     hp[starting_edge:ending_edge + 1] = [1] * ((ending_edge + 1) - starting_edge)
                     major_distance_count += 1
-                    if distance > hp_max[0] and loop_count < filtered_result.shape[1] - PIXEL_IGNORE_THRESHOLD:
+                    if distance > hp_max[0]:
                         hp_max[0] = distance
                         hp[starting_edge:ending_edge + 1] = [0.7] * ((ending_edge + 1) - starting_edge)
                         # print("Current Max Distance APM: ", distance)
@@ -333,13 +334,13 @@ def convert_pixels_to_measurements(filtered_result, image, test_max, test_max_2)
     # plt.imshow(actual_final)
     # plt.show()
 
-    return test_max_2[3], test_max[3], dvm, apm
+    return test_max_2[3], test_max[3], dvm, apm, actual_final
 """
 END OF FINAL RESULTS SECTION
 """
 
 if __name__ == "__main__":
-    directory = 'F:\Honours Image Library\Oysters\Test'
+    directory = 'F:\Honours Image Library\Oysters\ALL_IMAGES_3'
     images = listdir(directory)
 
     overal_start_time = time.time()
@@ -355,28 +356,27 @@ if __name__ == "__main__":
 
         cropped_image = region_of_interest_1(image)
         separated_oysters = region_of_interest_2(cropped_image)
-        plt.imshow(cropped_image)
-        plt.show()
-        break
         for key, oyster in separated_oysters.items():
             filtered_result, filtered_result_2 = canny(oyster)
 
-            #edges = cnn_5x5(oyster)
-            #filtered_result, filtered_result_2 = filtering_cnn(edges)
+            # edges = cnn_5x5(oyster)
+            # filtered_result, filtered_result_2 = filtering_cnn(edges)
 
             test_max = pixel_counter_net_images(filtered_result)
             test_max_2 = pixel_counter_net_images(filtered_result_2)
-            dvm_pixels, apm_pixels, dvm, apm = convert_pixels_to_measurements(filtered_result, oyster, test_max, test_max_2)
+            dvm_pixels, apm_pixels, dvm, apm, actual_final = convert_pixels_to_measurements(filtered_result, oyster, test_max, test_max_2)
 
             oyster_id = image_name[:-4]+"_"+key
             process_time = time.time() - oyster_process_start
 
+            plt.imshow(actual_final)
+            plt.savefig("F:\\Honours Image Library\\Oysters\Test\\"+str(oyster_id)+".JPG")
+
             oyster_results.append([oyster_id, dvm_pixels, apm_pixels, dvm, apm, process_time])
+
     overal_end_time = time.time() - overal_start_time
 
-
-
-    results_file_name = "canny.csv"
+    results_file_name = "canny_me.csv"
     results_file = open(results_file_name, 'w', newline='')
     writer = csv.writer(results_file)
     writer.writerows(oyster_results)
