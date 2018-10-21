@@ -12,8 +12,8 @@ import cv2
 
 
 PATH_TO_IMAGES = "E:\\Oysters\\3x3\\"
-CSV = "3x3csv.csv"
-CSV_NEW = "keptOysters3x3ALL.csv"
+CSV = "3x3_2.csv"
+CSV_NEW = "keptOysters3x3ALL2.csv"
 
 input_csv = open(CSV, 'r')
 output_csv = open(CSV_NEW, 'w')
@@ -32,7 +32,7 @@ for line in input_csv:
             print(line[0])
             pass
         user_input = input("1-nothing, 2-dvm, 3-apm, 4-both")
-        output_csv.write(line[0] + "," + line[1] + "," + line[2] + "," + user_input)
+        output_csv.write(line[0] + "," + line[1] + "," + line[2].strip('\n') + "," + user_input+ '\n')
         #old
         # user_input = input("Keep?")
         # if user_input == "1":

@@ -217,7 +217,8 @@ def filtering_cnn(result_rgb_edges):
             inner_list.append(new_pixel_value)
         filtered_result.append(inner_list)
     filtered_results_2 = np.array(filtered_result).transpose().tolist()
-
+    plt.imshow(filtered_result)
+    plt.show()
     return filtered_result, filtered_results_2
 
 """END OF EDGE DETECTION SECTION"""
@@ -340,6 +341,8 @@ END OF FINAL RESULTS SECTION
 """
 
 if __name__ == "__main__":
+    """ This main is configurable, Uncomment the desired algorithm parts to use, before running."""
+
     directory = 'F:\Honours Image Library\Oysters\ALL_IMAGES_3'
     images = listdir(directory)
 
@@ -357,14 +360,27 @@ if __name__ == "__main__":
         cropped_image = region_of_interest_1(image)
         separated_oysters = region_of_interest_2(cropped_image)
         for key, oyster in separated_oysters.items():
-            filtered_result, filtered_result_2 = canny(oyster)
+            #Canny
+            #filtered_result, filtered_result_2 = canny(oyster)
 
-            # edges = cnn_5x5(oyster)
+            #3x3CNN
+            edges = cnn_3x3(oyster)
+            filtered_result, filtered_result_2 = filtering_cnn(edges)
+
+            # 5x5CNN
+            # edges = cnn_3x3(oyster)
             # filtered_result, filtered_result_2 = filtering_cnn(edges)
 
             test_max = pixel_counter_net_images(filtered_result)
             test_max_2 = pixel_counter_net_images(filtered_result_2)
-            dvm_pixels, apm_pixels, dvm, apm, actual_final = convert_pixels_to_measurements(filtered_result, oyster, test_max, test_max_2)
+
+            #CNN's
+            dvm_pixels, apm_pixels, dvm, apm, actual_final = convert_pixels_to_measurements(edges, oyster,
+                                                                                            test_max, test_max_2)
+
+            #Canny
+            # dvm_pixels, apm_pixels, dvm, apm, actual_final = convert_pixels_to_measurements(filtered_result, oyster,
+            #                                                                                 test_max, test_max_2)
 
             oyster_id = image_name[:-4]+"_"+key
             process_time = time.time() - oyster_process_start
