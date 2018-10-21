@@ -15,7 +15,7 @@ Created in 2018 by Adrian Lapico for completion of a Bachelors of Information Te
 This is a multi purpose oyster sizer, using only images of pearl images.
 
 """
-
+# Copy paste the required config of Constants here.
 #THE MAIN ONE
 PIXEL_VALUE_TO_ACTUAL_VALUE_FACTOR = 0.039
 
@@ -30,7 +30,7 @@ cam_maker = 'GoPro'
 cam_model = 'HERO4 Silver'
 lens_maker = 'GoPro'
 lens_model = 'HERO4'
-focal_length = 3
+focal_length = 5
 apperture = 2.97
 
 #For Cropping
@@ -62,6 +62,8 @@ def lens_correction(image_to_lens_correct):
 def blur_image(image_to_blur):
     image = cv2.GaussianBlur(image_to_blur,(5,5), 1) #Bluring twice for net removal
     blured_image = cv2.GaussianBlur(image,(5,5), 1)
+    plt.imshow(image_to_blur)
+    plt.show()
     return blured_image
 
 def rotation_correction(image_to_rotate):
@@ -217,8 +219,6 @@ def filtering_cnn(result_rgb_edges):
             inner_list.append(new_pixel_value)
         filtered_result.append(inner_list)
     filtered_results_2 = np.array(filtered_result).transpose().tolist()
-    plt.imshow(filtered_result)
-    plt.show()
     return filtered_result, filtered_results_2
 
 """END OF EDGE DETECTION SECTION"""
@@ -343,7 +343,7 @@ END OF FINAL RESULTS SECTION
 if __name__ == "__main__":
     """ This main is configurable, Uncomment the desired algorithm parts to use, before running."""
 
-    directory = 'F:\Honours Image Library\Oysters\ALL_IMAGES_3'
+    directory = 'F:\Honours Image Library\Oysters\ALL_IMAGES_2'
     images = listdir(directory)
 
     overal_start_time = time.time()
@@ -361,11 +361,11 @@ if __name__ == "__main__":
         separated_oysters = region_of_interest_2(cropped_image)
         for key, oyster in separated_oysters.items():
             #Canny
-            #filtered_result, filtered_result_2 = canny(oyster)
+            filtered_result, filtered_result_2 = canny(oyster)
 
             #3x3CNN
-            edges = cnn_3x3(oyster)
-            filtered_result, filtered_result_2 = filtering_cnn(edges)
+            #edges = cnn_3x3(oyster)
+            #filtered_result, filtered_result_2 = filtering_cnn(edges)
 
             # 5x5CNN
             # edges = cnn_3x3(oyster)
@@ -375,12 +375,12 @@ if __name__ == "__main__":
             test_max_2 = pixel_counter_net_images(filtered_result_2)
 
             #CNN's
-            dvm_pixels, apm_pixels, dvm, apm, actual_final = convert_pixels_to_measurements(edges, oyster,
-                                                                                            test_max, test_max_2)
+            #dvm_pixels, apm_pixels, dvm, apm, actual_final = convert_pixels_to_measurements(edges, oyster,
+            #                                                                               test_max, test_max_2)
 
             #Canny
-            # dvm_pixels, apm_pixels, dvm, apm, actual_final = convert_pixels_to_measurements(filtered_result, oyster,
-            #                                                                                 test_max, test_max_2)
+            dvm_pixels, apm_pixels, dvm, apm, actual_final = convert_pixels_to_measurements(filtered_result, oyster,
+                                                                                            test_max, test_max_2)
 
             oyster_id = image_name[:-4]+"_"+key
             process_time = time.time() - oyster_process_start
