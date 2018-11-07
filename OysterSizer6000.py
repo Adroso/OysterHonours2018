@@ -8,6 +8,8 @@ import lensfunpy
 import csv
 from os import listdir
 import time
+import configs
+
 """
 Created in 2018 by Adrian Lapico for completion of a Bachelors of Information Technology Honours. 
 (Github Adroso, Adrian Lapico)
@@ -17,29 +19,29 @@ This is a multi purpose oyster sizer, using only images of pearl images.
 """
 # Copy paste the required config of Constants here.
 #THE MAIN ONE
-PIXEL_VALUE_TO_ACTUAL_VALUE_FACTOR = 0.039
+PIXEL_VALUE_TO_ACTUAL_VALUE_FACTOR = configs.PIXEL_VALUE_TO_ACTUAL_VALUE_FACTOR\
 
 #For pixel counting Algorithim
-PIXEL_TO_LOOK = 255 #set to 255 for canny or 1 for CNN
-INVERSE_PIXEL_TO_LOOK = 0
-DISTANCE_THRESHOLD = 40
-PIXEL_IGNORE_THRESHOLD = 30
+PIXEL_TO_LOOK = configs.PIXEL_TO_LOOK #set to 255 for canny or 1 for CNN
+INVERSE_PIXEL_TO_LOOK = configs.INVERSE_PIXEL_TO_LOOK
+DISTANCE_THRESHOLD = configs.DISTANCE_THRESHOLD
+PIXEL_IGNORE_THRESHOLD = configs.PIXEL_IGNORE_THRESHOLD
 
 #For Lens Correction
-cam_maker = 'GoPro'
-cam_model = 'HERO4 Silver'
-lens_maker = 'GoPro'
-lens_model = 'HERO4'
-focal_length = 5
-apperture = 2.97
+cam_maker = configs.cam_maker
+cam_model = configs.cam_model
+lens_maker = configs.lens_maker
+lens_model = configs.lens_model
+focal_length = configs.focal_length
+apperture = configs.apperture
 
 #For Cropping
-left_crop = 1750
-right_crop = 2500
-top_crop = 400
-bottom_crop = 2900
-NUMBER_OF_OYSTERS_HIGH = 6
-NUMBER_OF_OYSTERS_WIDE = 2
+left_crop = configs.left_crop
+right_crop = configs.right_crop
+top_crop = configs.top_crop
+bottom_crop = configs.bottom_crop
+NUMBER_OF_OYSTERS_HIGH = configs.NUMBER_OF_OYSTERS_HIGH
+NUMBER_OF_OYSTERS_WIDE = configs.NUMBER_OF_OYSTERS_WIDE
 # Note built for a max of 2 wide, if this needs to be changed for more than 2 code in the ROI section deeds to be edited
 
 """PRE POCESSING SECTION"""
@@ -398,3 +400,4 @@ if __name__ == "__main__":
     writer.writerows(oyster_results)
     results_file.close()
     print(overal_end_time)
+    #sugoi done
